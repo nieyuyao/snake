@@ -47,7 +47,7 @@ class Controller {
 		controlFlashPressed.visible = false;
 		container.addChild(controlFlashPressed);
 
-		const {normalizeDirec, contraryVector, app, map, snake} = this;
+		const {normalizeDirec, contraryVector, app, snake} = this;
 		const self = this;
 		this.pointerHandler = {
 			isControlPointerDown: false, //是否点击了控制区域
@@ -65,7 +65,7 @@ class Controller {
 				}
 			},
 			advance: function () {
-				map.advance(this.accOrSlowDown, this.advanceCallback, this);
+				snake.advance(this.accOrSlowDown, this.advanceCallback, this);
 			},
 			pointerDown(e) {
 				if (this.controlBackBounding.surroundPoint(e.point)) {
@@ -73,11 +73,6 @@ class Controller {
 					self.setRockerPos(this.matrix, e.point, this.controlBackOrigin);
 					//更新地图移动的方向
 					const direc = normalizeDirec({x: -e.point.x + this.controlBackOrigin.x, y: -e.point.y + this.controlBackOrigin.y});
-					map.setVec(
-						direc,
-						false,
-						-1
-					);
 					snake.turnAround(contraryVector(direc));
 				}
 				if (this.controlFlashPressedBouding.surroundPoint(e.point)) {
@@ -90,12 +85,6 @@ class Controller {
 				if (this.isControlPointerDown) {
 					self.setRockerPos(this.matrix, e.point, this.controlBackOrigin);
 					const direc = normalizeDirec({x: -e.point.x + this.controlBackOrigin.x, y: -e.point.y + this.controlBackOrigin.y});
-					//更新地图移动的方向
-					map.setVec(
-						direc,
-						false,
-						-1
-					);
 					snake.turnAround(contraryVector(direc));
 				}
 			},
