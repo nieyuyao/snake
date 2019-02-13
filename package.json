@@ -1,0 +1,36 @@
+{
+  "name": "snakes",
+  "version": "1.0.0",
+  "description": "snakes subsonic",
+  "main": "index.js",
+  "scripts": {
+    "dev": "NODE_ENV=development webpack-dev-server ",
+    "build": "NODE_ENV=production webpack --mode production -p --progress"
+  },
+  "keywords": [
+    "snake",
+    "subsonic",
+    "pixi"
+  ],
+  "author": "nie",
+  "license": "MIT",
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^10.0.1",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "clean-webpack-plugin": "^1.0.1",
+    "eslint": "^5.12.1",
+    "eslint-friendly-formatter": "^4.0.1",
+    "eslint-loader": "^2.1.1",
+    "html-webpack-plugin": "^3.2.0",
+    "uglifyjs-webpack-plugin": "^2.1.1",
+    "webpack": "^4.29.0",
+    "webpack-cli": "^3.2.1",
+    "webpack-dev-server": "^3.1.14"
+  },
+  "dependencies": {
+    "pixi.js": "^4.8.5"
+  }
+}

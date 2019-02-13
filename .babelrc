@@ -1,0 +1,19 @@
+{
+    "presets": [
+        [
+            "env",
+            {
+                "targets": {
+                    "browsers": [
+                        "iOS >= 9",
+                        "Android >= 5"
+                    ]
+                },
+                "modules": false
+            }
+        ]
+    ],
+    "compact": true,
+    "sourceMaps": true,
+    "retainLines": true
+}
