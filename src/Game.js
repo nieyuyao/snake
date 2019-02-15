@@ -10,8 +10,8 @@ class Game {
 		this.app = app;
 	}
 	init() {
-		this.snake = new Snake(this.app);
 		this.map = new GameMap(this.app);
+		this.snake = new Snake(this.app);
 		this.controller = new Controller(this.app, this.map, this.snake);
 		this.map.init();
 		this.controller.init();
@@ -22,7 +22,7 @@ class Game {
 			snake,
 			app
 		} = this;
-		app.stage.addChild(map.tilingSprite);
+		app.stage.addChild(map.sprite);
 		app.stage.addChild(controller.container);
 		app.stage.addChild(snake.container);
 		this.initEventListeners();

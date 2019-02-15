@@ -1,101 +1,92 @@
 import {
 	Texture,
-	extras
+	Sprite,
+	Matrix,
+	Point
 } from 'pixi.js';
 import EventController from './EventController.js';
-import Event from './Event.js';
 
 class GameMap {
 	constructor(app) {
 		this.name = 'gamemap';
-		this.v = 2;
-		this.a = 0.1;
-		this.vec = {
-			x: -2,
-			y: 0
-		};
-		this.app = app;
-		this.tilingSprite = null;
-		this.VEC_MAX = 4;
-		this.VEC_MIN = 2;
+		this.sprite = null;
+		this.screenWidth = app.screen.width;
+		this.screenHeight = app.screen.height;
+		//创建离屏canvas
+		const offsetCanvas = document.createElement('canvas');
+		offsetCanvas.width = this.screenWidth;
+		offsetCanvas.height = this.screenHeight;
+		this.offsetCtx = offsetCanvas.getContext('2d');
+		this.mapImage = new Image();
+		this.mapImage.src = '../assets/tile_map_1.png';
+		this.mapImage.crossOrigin = '*';
+		this.matrix = new Matrix(1, 0, 0, 1, 1100, 550);
 	}
 	init() {
 		const {
-			app,
-			move,
+			offsetCtx,
+			mapImage,
+			screenWidth,
+			screenHeight,
+			matrix
 		} = this;
-		const texture = new Texture.fromImage('../assets/tile_map.png');
-		this.tilingSprite = new extras.TilingSprite(texture, 3000, 3000);
-		this.tilingSprite.anchor.set(0.5, 0.5);
-		this.tilingSprite.position.set(app.screen.width / 2, app.screen.height / 2);
-		app.ticker.add(move, this);
+		this.bound = {
+			left: screenWidth / 2 - 3000 / 2,
+			right: screenWidth / 2 + 3000 / 2,
+			top: screenHeight / 2 - 1500 / 2,
+			bottom: screenHeight / 2 + 1500 / 2
+		};
+		const point = new Point(400, 200);
+		const mPoint = new Point();
+		matrix.apply(point, mPoint)
+		offsetCtx.drawImage(mapImage, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
+		const texture = new Texture.fromCanvas(offsetCtx.canvas);
+		this.sprite = new Sprite(texture);
+		const self = this;
+		const eventAdapter = {
+			eventHandler(ev) {
+				if (ev.type !== 'update-map') {
+					return;
+				}
+				self.update(ev.point);
+			}
+		}
+		EventController.subscribe(eventAdapter);
 	}
 	/**
-	 * 设置地图移动方向
-	 * @param {Object} direc 速度的方向
+	 * 更新地图
+	 * @param {Object} p 当前蛇头的位置{x, y}
 	 */
-	setVec(direc) {
-		this.vec.x = this.v * direc.x;
-		this.vec.y = this.v * direc.y;
-	}
-	/**
-	 * 加速减速
-	 * @param {Number} accOrSlowDown 1/加速 -1/加速
-	 * @param {Function} cb 回调
-	 * @param {Oject} context 回调函数上下文
-	 */
-	advance(accOrSlowDown, cb, context) {
-		if (this.v >= this.VEC_MAX && accOrSlowDown === 1) {
-			this.v = this.VEC_MAX;
-			return;
-		}
-		else if (this.v <= this.VEC_MIN && accOrSlowDown === -1) {
-			this.v = this.VEC_MIN;
-			return;
-		}
-		else {
-			const v = this.v;
-			this.v += accOrSlowDown * this.a;
-			if (this.v >= this.VEC_MAX) {
-				cb.bind(context)(1);
-			}
-			if (this.v <= this.VEC_MIN) {
-				cb.bind(context)(-1);
-			}
-			const {x: vx = 0, y: vy = 0} = this.vec;
-			this.vec.x = this.v * vx / v;
-			this.vec.y = this.v * vy / v;
-		}
-	}
-	//更新地图位置
-	move() {
+	update(p) {
+		let { x, y } = p; //x, y为图片裁剪区的中心
 		const {
-			tilingSprite,
-			app
+			sprite,
+			mapImage,
+			screenWidth,
+			screenHeight,
+			offsetCtx,
+			matrix
 		} = this;
-		const {
-			x: vx = 0,
-			y: vy = 0
-		} = this.vec;
-		let x = tilingSprite.position.x;
-		let y = tilingSprite.position.y;
-		x += vx;
-		y += vy;
+		const { left, right, top, bottom } = this.bound;
 		//判断地图是否已经超出边界
-		if (
-			(x + tilingSprite.width / 2 <= app.screen.width || x - tilingSprite.width / 2 >= 0) &&
-			(y + tilingSprite.height / 2 <= app.screen.height || y - tilingSprite.height / 2 >= 0)
-		) {
-			EventController.publish(new Event('ahead-map-bound', this.v, 0));
-			return;
-		} else if ((x + tilingSprite.width / 2 <= app.screen.width || x - tilingSprite.width / 2 >= 0)) {
-			tilingSprite.position.y = y;
-		} else if (y + tilingSprite.height / 2 <= app.screen.height || y - tilingSprite.height / 2 >= 0) {
-			tilingSprite.position.x = x;
-		} else {
-			tilingSprite.position.x = x;
-			tilingSprite.position.y = y;
+		if (x + screenWidth / 2 >= right) {
+			x = right - screenWidth / 2;
 		}
+		if (x - screenWidth / 2 <= left) {
+			x = left + screenWidth / 2;
+		}
+		if (y + screenHeight / 2 >= bottom) {
+			y = bottom - screenHeight / 2;
+		}
+		if (y - screenHeight / 2 <= top) {
+			y = top + screenHeight / 2;
+		}
+		const point = new Point(x, y);
+		const mPoint = new Point();
+		matrix.apply(point, mPoint);
+		offsetCtx.clearRect(0, 0, screenWidth, screenHeight);
+		offsetCtx.drawImage(mapImage, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
+		sprite.texture.update();
 	}
 }
 export default GameMap;

@@ -1,6 +1,8 @@
 import { Sprite, Texture } from 'pixi.js';
 import { crossProduct, isEqualVector, mode } from './Bound.js';
-import Interpolation from './Interpolation';
+import Interpolation from './Interpolation.js';
+import EventController from './EventController.js';
+import Event from './Event.js';
 
 class SnakeBody {
 	/**
@@ -10,13 +12,13 @@ class SnakeBody {
 	 * @param {String} type 蛇身还是蛇头 'head'|'body'
 	 * @param {Object} bound 边界 {x, y}
 	 */
-	constructor(precursor, cate = 1, type = 'body', bound = {x: 0, y: 0}) {
+	constructor(precursor, cate = 1, type = 'body', bound = {left: 0, right: 0, top: 0, bottom: 0}) {
 		this.precursor = precursor;
 		this.name = 'snakebody';
 		this.sprite = null;
 		this.cate = cate;
 		this.type = type;
-		this.bound = bound;
+		this.bound = bound; //边界
 		this.direc = {x: 1, y: 0};
 		this.direcInterp = new Interpolation({x: 1, y: 0}, 6);
 		if (this.type === 'body') {
@@ -25,6 +27,16 @@ class SnakeBody {
 				y: precursor.sprite.position.y
 			}
 		}
+		//全局位置
+		this.pos = {
+			x: 800 / 2,
+			y: 400 / 2
+		};
+		//相对于窗口的位置
+		this.screenPos = {
+			x: 800 / 2,
+			y: 400 / 2
+		};
 		this.init();
 	}
 	init() {
@@ -65,7 +77,7 @@ class SnakeBody {
 		const { position: precursorPos, width: width } = precursor.sprite;
 		const { x: dx = 0, y: dy = 0 } = direc;
 		pos.x = precursorPos.x - width * dx;
-		pos.y = precursorPos.y - width * dy
+		pos.y = precursorPos.y - width * dy;
 		sprite.position.set(pos.x, pos.y);
 	}
 	//设置蛇头的插值方向
@@ -84,27 +96,47 @@ class SnakeBody {
 	}
 	//更新蛇头的位置
 	updateHeadPos(v) {
-		const { direc, sprite, bound } = this;
-		const pos = sprite.position;
-		let {x, y} = pos;
-		x += v * direc.x;
-		y += v * direc.y;
-		if (x + sprite.width / 2 >= bound.x) {
-			pos.x = bound.x - sprite.width / 2;
+		const { sprite, direc, screenPos, pos } = this;
+		const { left, right, top, bottom } = this.bound;
+		let x = pos.x + direc.x * v;
+		let y = pos.y + direc.y * v;
+		const w = sprite.width / 2;
+		const h = sprite.height / 2;
+		if (x - w <= left) {
+			pos.x = left + w;
 			pos.y = y;
-		} else if (x - sprite.width / 2 <= 0) {
-			pos.x = sprite.width / 2;
+		} else if (x + w >= right) {
+			pos.x = right - w;
 			pos.y = y;
-		} else if (y + sprite.height / 2 >= bound.y) {
+		} else if (y - h <= top) {
 			pos.x = x;
-			pos.y = bound.y - sprite.height / 2;
-		} else if (y - sprite.height / 2 <= 0) {
+			pos.y = top + h;
+		} else if (y + h >= bottom) {
 			pos.x = x;
-			pos.y = sprite.height / 2;
+			pos.y = bottom - h;
 		} else {
 			pos.x = x;
 			pos.y = y;
 		}
+		x = 400;
+		y = 200;
+		if (pos.x - 400 <= left) {
+			x = 400 + pos.x - (left + 400);
+		} 
+		if (pos.x + 400 >= right) {
+			x = 400 +  pos.x - (right - 400);
+		}
+		if (pos.y - 200 <= top) {
+			y = 200 + pos.y - (top + 200);
+		}
+		if (pos.y + 200 >= bottom) {
+			y = 200 + pos.y - (bottom - 200);
+		}
+		screenPos.x = x;
+		screenPos.y = y;
+		sprite.position.set(screenPos.x, screenPos.y);
+		//通知地图更新位置
+		EventController.publish(new Event('update-map', pos.x, pos.y));
 	}
 }
 

@@ -1,7 +1,6 @@
 export default {
 	recievers: [],
 	subscribe(reciever) {
-		console.log(reciever)
 		if (reciever.eventHandler) {
 			this.recievers.push(reciever);
 			return;
