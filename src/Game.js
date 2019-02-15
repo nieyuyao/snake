@@ -3,6 +3,7 @@ import Controller from './Controller.js';
 import Event from './Event.js';
 import EventController from './EventController.js';
 import Snake from './Snake.js';
+import FoodsManager from './FoodsManager.js';
 
 class Game {
 	constructor(app) {
@@ -10,19 +11,23 @@ class Game {
 		this.app = app;
 	}
 	init() {
+		this.foodsManager = new FoodsManager(this.app);
 		this.map = new GameMap(this.app);
 		this.snake = new Snake(this.app);
 		this.controller = new Controller(this.app, this.map, this.snake);
 		this.map.init();
 		this.controller.init();
 		this.snake.init();
+		this.foodsManager.init();
 		const {
 			map,
 			controller,
 			snake,
-			app
+			app,
+			foodsManager
 		} = this;
 		app.stage.addChild(map.sprite);
+		app.stage.addChild(foodsManager.sprite);
 		app.stage.addChild(controller.container);
 		app.stage.addChild(snake.container);
 		this.initEventListeners();

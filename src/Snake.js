@@ -27,7 +27,6 @@ class Snake {
 		this.head = new SnakeBody(null, this.cate, 'head', bound);
 		const { container, head } = this;
 		head.sprite.position.set(app.screen.width / 2, app.screen.height / 2);
-		container.addChild(this.head.sprite);
 		//蛇身
 		const body1 = new SnakeBody(this.head, this.cate, 'body', bound);
 		const body2 = new SnakeBody(body1, this.cate, 'body', bound);
@@ -66,10 +65,11 @@ class Snake {
 		bodies.push(body17);
 		bodies.push(body18);
 
-		for (let i = 0; i < 18; i++) {
+		for (let i = 17; i >= 0; i--) {
 			const body = bodies[i];
 			container.addChild(body.sprite);
 		}
+		container.addChild(this.head.sprite);
 		app.ticker.add(update, this);
 	}
 	//转向
@@ -83,7 +83,7 @@ class Snake {
 	update() {
 		this.head.updateHeadDirec();
 		this.head.updateHeadPos(this.v);
-		for (let i = this.bodies.length - 1; i >= 0; i--) {
+		for (let i = 0; i < this.bodies.length; i++) {
 			this.bodies[i].update();
 		}
 	}

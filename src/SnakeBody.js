@@ -81,16 +81,25 @@ class SnakeBody {
 		sprite.position.set(pos.x, pos.y);
 	}
 	//设置蛇头的插值方向
-	setHeadDirec(direc) {
+	setHeadDirec(direc) {		
 		this.direcInterp.setNext(direc);
 	}
 	//更新蛇头的插值方向
 	updateHeadDirec() {
-		const { direcInterp, direc, sprite } = this;
+		const { direcInterp, direc, sprite, bound, pos } = this;
 		const lerpDirec = direcInterp.lerp();
 		direc.x = lerpDirec.x;
 		direc.y = lerpDirec.y;
 		const cosval = Math.acos(direc.x);
+		const w = sprite.width / 2;
+		const h = w;
+		const { x, y } = pos;
+		if ((x - w <= bound.left && direc.x < 0) || (x + w >= bound.right && direc.x > 0)) {
+			//到达左边缘
+			direc.x = 0;
+		} else if ((y - h <= bound.top && direc.y < 0) || (y + h >= bound.bottom && direc.y > 0)) {
+			direc.y = 0;
+		}
 		const cross = crossProduct({x: 1, y: 0}, direc);
 		sprite.rotation = cross.z > 0 ? cosval : -1 * cosval;
 	}
@@ -102,34 +111,32 @@ class SnakeBody {
 		let y = pos.y + direc.y * v;
 		const w = sprite.width / 2;
 		const h = sprite.height / 2;
+		pos.x = x;
+		pos.y = y;
 		if (x - w <= left) {
 			pos.x = left + w;
 			pos.y = y;
 		} else if (x + w >= right) {
 			pos.x = right - w;
 			pos.y = y;
-		} else if (y - h <= top) {
+		}
+		if (y - h <= top) {
 			pos.x = x;
 			pos.y = top + h;
 		} else if (y + h >= bottom) {
 			pos.x = x;
 			pos.y = bottom - h;
-		} else {
-			pos.x = x;
-			pos.y = y;
 		}
 		x = 400;
 		y = 200;
 		if (pos.x - 400 <= left) {
 			x = 400 + pos.x - (left + 400);
-		} 
-		if (pos.x + 400 >= right) {
+		} else if (pos.x + 400 >= right) {
 			x = 400 +  pos.x - (right - 400);
 		}
 		if (pos.y - 200 <= top) {
 			y = 200 + pos.y - (top + 200);
-		}
-		if (pos.y + 200 >= bottom) {
+		} else if (pos.y + 200 >= bottom) {
 			y = 200 + pos.y - (bottom - 200);
 		}
 		screenPos.x = x;
@@ -137,6 +144,7 @@ class SnakeBody {
 		sprite.position.set(screenPos.x, screenPos.y);
 		//通知地图更新位置
 		EventController.publish(new Event('update-map', pos.x, pos.y));
+		EventController.publish(new Event('update-foods', pos.x, pos.y));
 	}
 }
 
