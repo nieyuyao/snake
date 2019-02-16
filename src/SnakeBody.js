@@ -3,6 +3,7 @@ import { crossProduct, isEqualVector, mode } from './Bound.js';
 import Interpolation from './Interpolation.js';
 import EventController from './EventController.js';
 import Event from './Event.js';
+import { Sphere } from './Bound.js';
 
 class SnakeBody {
 	/**
@@ -21,12 +22,6 @@ class SnakeBody {
 		this.bound = bound; //边界
 		this.direc = {x: 1, y: 0};
 		this.direcInterp = new Interpolation({x: 1, y: 0}, 6);
-		if (this.type === 'body') {
-			this.pos = {
-				x: precursor.sprite.position.x - precursor.sprite.width,
-				y: precursor.sprite.position.y
-			}
-		}
 		//全局位置
 		this.pos = {
 			x: 800 / 2,
@@ -40,14 +35,19 @@ class SnakeBody {
 		this.init();
 	}
 	init() {
-		const { pos, type } = this;
 		const frame = this.type + this.cate + '.png';
 		this.sprite = new Sprite(Texture.fromFrame(frame));
 		this.sprite.scale.set(0.4, 0.4);
 		this.sprite.anchor.set(0.5, 0.5);
+		const { pos, type, precursor, sprite } = this;
 		if (type === 'body') {
+			this.pos.x = precursor.sprite.position.x - sprite.width * precursor.direc.x;
+			this.pos.y = precursor.sprite.position.y - sprite.width * precursor.direc.y;
+			this.direc.x = precursor.direc.x;
+			this.direc.y = precursor.direc.y;
 			this.sprite.position.set(pos.x, pos.y);
 		}
+		this.boundingSphere = new Sphere(0, 0, sprite.width);
 	}
 	update() {
 		this.updateDirec();

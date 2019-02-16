@@ -1,4 +1,4 @@
-import { Sprite, Texture } from 'pixi.js';
+import Interpolation from './Interpolation.js';
 const tile = {
 	1: {
 		"x": 0,
@@ -37,15 +37,15 @@ const tile = {
 		"h": 5
 	}
 }
-
 class Food {
 	/**
 	 * @param {Number} x 食物的x坐标
 	 * @param {Nunber} y 食物的y坐标
 	 * @param {Number} type 食物的类别
 	 * @param {Number} order 食物的顺序号
+	 * @param {PIXI.Ticker} ticker
 	 */
-	constructor(x = 0, y = 0, type = 1, order = 0) {
+	constructor(x = 0, y = 0, type = 1, order = 0, ticker) {
 		this.x = x;
 		this.y = y;
 		this.type = type;
@@ -55,12 +55,40 @@ class Food {
 		this.imgY = tile[type].y;
 		this.w = tile[type].w;
 		this.h = tile[type].h;
+		this.interp = new Interpolation({x: x, y: y}, 10);
+		this.ticker = ticker;
+		this.eaten = false;
 	}
 	/**
 	 * 移动食物
 	 * @param {Object} targetPos 目标位置
 	 */
 	moveToSnake(targetPos) {
+		this.eaten = true;
+		this.interp.setNext(targetPos);
+		//启动
+		this.ticker.add(this.update, this);
+	}
+	/**
+	 * 更新食物位置
+	 */
+	update() {
+		const val = this.interp.lerp();
+		const dx = this.x - val.x;
+		const dy = this.y - val.y;
+		if (dx * dx + dy * dy < 1) {
+			this.destory();
+			return;
+		}
+		this.x = val.x;
+		this.y = val.y;
+	}
+	/**
+	 * 销毁食物
+	 */
+	destory() {
+		this.ticker.remove(this.destory, this);
+		this.visible = false;
 	}
 }
 export default Food;
