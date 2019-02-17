@@ -12,8 +12,10 @@ class SnakeBody {
 	 * @param {Number} cate 蛇的颜色
 	 * @param {String} type 蛇身还是蛇头 'head'|'body'
 	 * @param {Object} bound 边界 {x, y}
+	 * @param {Number} screenWidth 屏幕宽
+	 * @param {Number} screenHeight 屏幕高
 	 */
-	constructor(precursor, cate = 1, type = 'body', bound = {left: 0, right: 0, top: 0, bottom: 0}) {
+	constructor(precursor, cate = 1, type = 'body', bound = {left: 0, right: 0, top: 0, bottom: 0}, screenWidth = 0, screenHeight = 0) {
 		this.precursor = precursor;
 		this.name = 'snakebody';
 		this.sprite = null;
@@ -23,15 +25,17 @@ class SnakeBody {
 		this.direc = {x: 1, y: 0};
 		this.direcInterp = new Interpolation({x: 1, y: 0}, 6);
 		//全局位置
-		this.pos = {
-			x: 800 / 2,
-			y: 400 / 2
-		};
-		//相对于窗口的位置
-		this.screenPos = {
-			x: 800 / 2,
-			y: 400 / 2
-		};
+		if (type === 'head') {
+			this.pos = {
+				x: screenWidth / 2,
+				y: screenHeight / 2
+			};
+			//相对于窗口的位置
+			this.screenPos = {
+				x: screenWidth / 2,
+				y: screenHeight / 2
+			};
+		}
 		this.init();
 	}
 	init() {
@@ -39,13 +43,13 @@ class SnakeBody {
 		this.sprite = new Sprite(Texture.fromFrame(frame));
 		this.sprite.scale.set(0.4, 0.4);
 		this.sprite.anchor.set(0.5, 0.5);
-		const { pos, type, precursor, sprite } = this;
+		const { type, precursor, sprite } = this;
 		if (type === 'body') {
-			this.pos.x = precursor.sprite.position.x - sprite.width * precursor.direc.x;
-			this.pos.y = precursor.sprite.position.y - sprite.width * precursor.direc.y;
+			const x = precursor.sprite.position.x - sprite.width * precursor.direc.x;
+			const y = precursor.sprite.position.y - sprite.width * precursor.direc.y;
 			this.direc.x = precursor.direc.x;
 			this.direc.y = precursor.direc.y;
-			this.sprite.position.set(pos.x, pos.y);
+			this.sprite.position.set(x, y);
 		}
 		this.boundingSphere = new Sphere(0, 0, sprite.width);
 	}
@@ -55,7 +59,9 @@ class SnakeBody {
 			this.updatePos();
 		}
 	}
-	//方向进行插值更新
+	/**
+	 * 方向进行插值更新
+	 */
 	updateDirec() {
 		const { direcInterp, direc, precursor, sprite } = this;
 		const precursorDirec = precursor.direc;
@@ -71,20 +77,27 @@ class SnakeBody {
 		const cross = crossProduct({x: 1, y: 0}, direc);
 		sprite.rotation = cross > 0 ? cosval : -1 * cosval;
 	}
-	//位置进行插值更新
+	/**
+	 * 位置进行插值更新
+	 */
 	updatePos() {
-		const { direc, sprite, precursor, pos } = this;
+		const { direc, sprite, precursor } = this;
 		const { position: precursorPos, width: width } = precursor.sprite;
 		const { x: dx = 0, y: dy = 0 } = direc;
-		pos.x = precursorPos.x - width * dx;
-		pos.y = precursorPos.y - width * dy;
-		sprite.position.set(pos.x, pos.y);
+		const x = precursorPos.x - width * dx;
+		const y = precursorPos.y - width * dy;
+		sprite.position.set(x, y);
 	}
-	//设置蛇头的插值方向
+	/**
+	 * 设置蛇头的插值方向
+	 * @param {Object} direc {x, y}
+	 */
 	setHeadDirec(direc) {		
 		this.direcInterp.setNext(direc);
 	}
-	//更新蛇头的插值方向
+	/**
+	 * 更新蛇头的插值方向
+	 */
 	updateHeadDirec() {
 		const { direcInterp, direc, sprite, bound, pos } = this;
 		const lerpDirec = direcInterp.lerp();
@@ -103,7 +116,10 @@ class SnakeBody {
 		const cross = crossProduct({x: 1, y: 0}, direc);
 		sprite.rotation = cross.z > 0 ? cosval : -1 * cosval;
 	}
-	//更新蛇头的位置
+	/**
+	 * 更新蛇头的位置
+	 * @param {Object} v 速度 {x, y}
+	 */
 	updateHeadPos(v) {
 		const { sprite, direc, screenPos, pos } = this;
 		const { left, right, top, bottom } = this.bound;

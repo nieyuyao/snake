@@ -5,7 +5,10 @@ import {
 	Point
 } from 'pixi.js';
 import EventController from './EventController.js';
-
+import {
+	_OFFSET_CANVAS_WIDTH,
+	_OFFSET_CANVAS_HEIGHT
+} from './constants.js';
 class GameMap {
 	constructor(app) {
 		this.name = 'gamemap';
@@ -20,7 +23,8 @@ class GameMap {
 		this.mapImage = new Image();
 		this.mapImage.src = '../assets/tile_map_1.png';
 		this.mapImage.crossOrigin = '*';
-		this.matrix = new Matrix(1, 0, 0, 1, 1100, 550);
+		this.matrix = new Matrix(1, 0, 0, 1, 0, 0);
+		this.mPoint = new Point();
 	}
 	init() {
 		const {
@@ -28,17 +32,19 @@ class GameMap {
 			mapImage,
 			screenWidth,
 			screenHeight,
-			matrix
+			matrix,
+			mPoint
 		} = this;
+		matrix.tx = (_OFFSET_CANVAS_WIDTH - screenWidth) / 2;
+		matrix.ty = (_OFFSET_CANVAS_HEIGHT - screenHeight) / 2;
 		this.bound = {
-			left: screenWidth / 2 - 3000 / 2,
-			right: screenWidth / 2 + 3000 / 2,
-			top: screenHeight / 2 - 1500 / 2,
-			bottom: screenHeight / 2 + 1500 / 2
+			left: screenWidth / 2 - _OFFSET_CANVAS_WIDTH / 2,
+			right: screenWidth / 2 + _OFFSET_CANVAS_WIDTH / 2,
+			top: screenHeight / 2 - _OFFSET_CANVAS_HEIGHT / 2,
+			bottom: screenHeight / 2 + _OFFSET_CANVAS_HEIGHT / 2
 		};
 		const point = new Point(400, 200);
-		const mPoint = new Point();
-		matrix.apply(point, mPoint)
+		matrix.apply(point, mPoint);
 		offsetCtx.drawImage(mapImage, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
 		const texture = new Texture.fromCanvas(offsetCtx.canvas);
 		this.sprite = new Sprite(texture);
@@ -65,7 +71,8 @@ class GameMap {
 			screenWidth,
 			screenHeight,
 			offsetCtx,
-			matrix
+			matrix,
+			mPoint
 		} = this;
 		const { left, right, top, bottom } = this.bound;
 		//判断地图是否已经超出边界
@@ -81,10 +88,9 @@ class GameMap {
 		if (y - screenHeight / 2 <= top) {
 			y = top + screenHeight / 2;
 		}
-		const point = new Point(x, y);
-		const mPoint = new Point();
-		matrix.apply(point, mPoint);
 		offsetCtx.clearRect(0, 0, screenWidth, screenHeight);
+		const point = new Point(x, y);
+		matrix.apply(point, mPoint);
 		offsetCtx.drawImage(mapImage, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
 		sprite.texture.update();
 	}

@@ -43,9 +43,10 @@ class Food {
 	 * @param {Nunber} y 食物的y坐标
 	 * @param {Number} type 食物的类别
 	 * @param {Number} order 食物的顺序号
+	 * @param {String} divitionKey
 	 * @param {PIXI.Ticker} ticker
 	 */
-	constructor(x = 0, y = 0, type = 1, order = 0, ticker) {
+	constructor(x = 0, y = 0, type = 1, order = 0, divitionKey = '_0_0', ticker) {
 		this.x = x;
 		this.y = y;
 		this.type = type;
@@ -55,9 +56,10 @@ class Food {
 		this.imgY = tile[type].y;
 		this.w = tile[type].w;
 		this.h = tile[type].h;
-		this.interp = new Interpolation({x: x, y: y}, 10);
+		this.interp = new Interpolation({x: x, y: y}, 6);
 		this.ticker = ticker;
 		this.eaten = false;
+		this.divitionKey = divitionKey;
 	}
 	/**
 	 * 移动食物

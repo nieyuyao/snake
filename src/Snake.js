@@ -38,7 +38,7 @@ class Snake {
 		};
 		this.bound = bound;
 		//蛇头
-		this.head = new SnakeBody(null, cate, 'head', bound);
+		this.head = new SnakeBody(null, cate, 'head', bound, app.screen.width, app.screen.heigh);
 		const head = this.head;
 		head.sprite.position.set(app.screen.width / 2, app.screen.height / 2);
 		//蛇身
@@ -116,12 +116,15 @@ class Snake {
 			}
 		}
 	}
+	getBoundingSphere() {
+		return this.head.boundingSphere;
+	}
 	/**
 	 * 检查是否与其他蛇碰撞
 	 * @param {Snake} snake
 	 */
 	collisite(snake) {
-		Collisition.sphereCollisition();
+		Collisition.sphereCollisition(this.getBoundingSphere(), snake.getBoundingSphere());
 	}
 }
 
