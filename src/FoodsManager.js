@@ -23,6 +23,7 @@ import {
 
 class FoodsManager {
 	constructor(app) {
+		this.name = 'foodsmanager';
 		this.app = app;
 		this.foods = [];
 		this.idleOrder = 0; //表示食物列表空闲的最小值，防止每次遍历食物列表都从0开始，降低时间复杂度

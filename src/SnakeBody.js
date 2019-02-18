@@ -15,9 +15,9 @@ class SnakeBody {
 	 * @param {Number} screenWidth 屏幕宽
 	 * @param {Number} screenHeight 屏幕高
 	 */
-	constructor(precursor, cate = 1, type = 'body', bound = {left: 0, right: 0, top: 0, bottom: 0}, screenWidth = 0, screenHeight = 0) {
+	constructor(precursor, cate = 1, type = 'body', headInitialPos, bound = {left: 0, right: 0, top: 0, bottom: 0}, screenWidth = 0, screenHeight = 0) {
 		this.precursor = precursor;
-		this.name = 'snakebody';
+		this.name = 'SnakeBody';
 		this.sprite = null;
 		this.cate = cate;
 		this.type = type;
@@ -26,10 +26,7 @@ class SnakeBody {
 		this.direcInterp = new Interpolation({x: 1, y: 0}, 6);
 		//全局位置
 		if (type === 'head') {
-			this.pos = {
-				x: screenWidth / 2,
-				y: screenHeight / 2
-			};
+			this.pos = headInitialPos;
 			//相对于窗口的位置
 			this.screenPos = {
 				x: screenWidth / 2,

@@ -2,10 +2,14 @@ import SnakeBody from './SnakeBody.js';
 import { Container } from 'pixi.js';
 import EventController from './EventController.js';
 import Collision from './Collision.js';
-
+import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM } from './constants';
 class Snake {
-	constructor(app) {
-		this.name = 'snake';
+	/**
+	 * @param {PIXI.Application} app 
+	 * @param {Object} headInitialPos 蛇头的初始位置
+	 */
+	constructor(app, headInitialPos) {
+		this.name = 'Snake';
 		this.head = null;
 		this.bodies = [];
 		this.cate = 1; //类别
@@ -17,6 +21,10 @@ class Snake {
 		this.VEC_MIN = 2;
 		this.a = 0.1;
 		this._score = 0;
+		this.headInitialPos = {
+			x: app.screen.width / 2,
+			y: app.screen.height / 2
+		};
 	}
 	get score() {
 		return this._score;
@@ -28,17 +36,17 @@ class Snake {
 		this._score = val;
 	}
 	init() {
-		const { app, bodies, update, cate, bodyContainer, container } = this;
+		const { app, bodies, update, cate, bodyContainer, container, headInitialPos } = this;
 		//边界
 		const bound = {
-			left: app.screen.width / 2 - 3000 / 2,
-			right: app.screen.width / 2 + 3000 / 2,
-			top: app.screen.height / 2 - 1500 / 2,
-			bottom: app.screen.height / 2 + 1500 / 2
+			left: app.screen.width / 2 - _OFFSET_CANVAS_WIDTH / 2,
+			right: app.screen.width / 2 + _OFFSET_CANVAS_WIDTH / 2,
+			top: app.screen.height / 2 - _OFFSET_CANVAS_HEIGHT / 2,
+			bottom: app.screen.height / 2 + _OFFSET_CANVAS_HEIGHT / 2
 		};
 		this.bound = bound;
 		//蛇头
-		this.head = new SnakeBody(null, cate, 'head', bound, app.screen.width, app.screen.heigh);
+		this.head = new SnakeBody(null, cate, 'head', headInitialPos, bound, app.screen.width, app.screen.height);
 		const head = this.head;
 		head.sprite.position.set(app.screen.width / 2, app.screen.height / 2);
 		//蛇身
@@ -52,7 +60,7 @@ class Snake {
 		bodies.push(body3);
 		bodies.push(body4);
 
-		for (let i = 0; i < 4; i++) {
+		for (let i = 0; i < INITIAL_SNAKE_BODY_NUM; i++) {
 			const body = bodies[i];
 			bodyContainer.addChild(body.sprite);
 		}
@@ -123,7 +131,7 @@ class Snake {
 	 * 检查是否与其他蛇碰撞
 	 * @param {Snake} snake
 	 */
-	collisite(snake) {
+	collide(snake) {
 		Collisition.sphereCollisition(this.getBoundingSphere(), snake.getBoundingSphere());
 	}
 }
