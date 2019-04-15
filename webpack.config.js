@@ -15,19 +15,19 @@ const config = {
 	},
 	module: {
 		rules: [
-			{
-				test: /\.js$/,
-				include: path.join(__dirname, '/src'),
-				enforce: 'pre',
-				loader: 'eslint-loader',
-				options: {
-					failOnError: false,
-					failOnWarning: false,
-					emitError: false,
-					emitWarning: true,
-					formatter: require('eslint-friendly-formatter')
-				}
-			},
+			// {
+			// 	test: /\.js$/,
+			// 	include: path.join(__dirname, '/src'),
+			// 	enforce: 'pre',
+			// 	loader: 'eslint-loader',
+			// 	options: {
+			// 		failOnError: false,
+			// 		failOnWarning: false,
+			// 		emitError: false,
+			// 		emitWarning: true,
+			// 		formatter: require('eslint-friendly-formatter')
+			// 	}
+			// },
 			{
 				test: /\.js$/,
 				include: path.join(__dirname, './src'),

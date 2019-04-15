@@ -4,7 +4,7 @@
   "description": "snakes subsonic",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development webpack-dev-server ",
+    "dev": "NODE_ENV=development webpack-dev-server --mode development",
     "build": "NODE_ENV=production webpack --mode production -p --progress"
   },
   "keywords": [
@@ -22,8 +22,10 @@
     "babel-preset-env": "^1.7.0",
     "clean-webpack-plugin": "^1.0.1",
     "eslint": "^5.12.1",
+    "eslint-config-airbnb-base": "^13.1.0",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-loader": "^2.1.1",
+    "eslint-plugin-import": "^2.17.1",
     "html-webpack-plugin": "^3.2.0",
     "uglifyjs-webpack-plugin": "^2.1.1",
     "webpack": "^4.29.0",
