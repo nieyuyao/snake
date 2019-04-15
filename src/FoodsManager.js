@@ -1,15 +1,15 @@
-import Food from './Food.js';
 import {
 	Sprite,
 	Texture,
 	Point,
 	Matrix
 } from 'pixi.js';
-import EventController from './EventController.js';
-import Event from './Event.js';
+import Food from './Food';
+import EventController from './EventController';
+import Event from './Event';
 import {
 	Sphere
-} from './Bound.js';
+} from './Bound';
 
 import {
 	FOOD_NUM_MAX,
@@ -19,7 +19,7 @@ import {
 	HORIZONTAL_DIVISION_NUM,
 	VERTICAL__DIVISION_NUM,
 	DIVISION_WIDTH
-} from './constants.js';
+} from './constants';
 
 class FoodsManager {
 	constructor(app) {

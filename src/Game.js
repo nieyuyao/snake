@@ -1,9 +1,9 @@
-import GameMap from './GameMap.js';
-import Controller from './Controller.js';
-import Event from './Event.js';
-import EventController from './EventController.js';
-import Snake from './Snake.js';
-import FoodsManager from './FoodsManager.js';
+import GameMap from './GameMap';
+import Controller from './Controller';
+import Event from './Event';
+import EventController from './EventController';
+import Snake from './Snake';
+import FoodsManager from './FoodsManager';
 
 class Game {
 	constructor(app) {

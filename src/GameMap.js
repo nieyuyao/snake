@@ -4,11 +4,11 @@ import {
 	Matrix,
 	Point
 } from 'pixi.js';
-import EventController from './EventController.js';
+import EventController from './EventController';
 import {
 	_OFFSET_CANVAS_WIDTH,
 	_OFFSET_CANVAS_HEIGHT
-} from './constants.js';
+} from './constants';
 class GameMap {
 	constructor(app) {
 		this.name = 'gamemap';

@@ -1,4 +1,4 @@
-import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM } from './constants.js';
+import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM } from './constants';
 
 class SnakeManager {
 	constructor(app) {

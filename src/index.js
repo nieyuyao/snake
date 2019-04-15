@@ -1,11 +1,11 @@
-import Game from './Game.js';
-import source from './source.js';
 import {
 	loaders,
 	Text,
 	TextStyle,
 	Application
 } from 'pixi.js';
+import Game from './Game';
+import source from './source';
 
 const app = new Application({
 	height: 400

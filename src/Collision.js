@@ -1,5 +1,5 @@
 
-import { Rectangle, Sphere } from './Bound.js';
+import { Rectangle, Sphere } from './Bound';
 
 const Collisition = {
 	/**
