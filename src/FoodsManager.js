@@ -18,7 +18,8 @@ import {
 	_OFFSET_CANVAS_HEIGHT,
 	HORIZONTAL_DIVISION_NUM,
 	VERTICAL__DIVISION_NUM,
-	DIVISION_WIDTH
+	DIVISION_WIDTH,
+	UPDATE_SCORE
 } from './constants';
 
 class FoodsManager {
@@ -217,7 +218,7 @@ class FoodsManager {
 	 */
 	eatFood(food, p) {
 		food.moveToSnake(p);
-		EventController.publish(new Event('update-socre'));
+		EventController.publish(new Event(UPDATE_SCORE));
 	}
 	/**
 	 * 更新食物

@@ -1,23 +1,25 @@
 import { Container } from 'pixi.js';
 import SnakeBody from './SnakeBody';
 import EventController from './EventController';
+import Event from './Event';
 import Collision from './Collision';
-import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM } from './constants';
+import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, COLLISION, UPDATE_SCORE } from './constants';
 
 class Snake {
 	/**
 	 * @param {PIXI.Application} app 
 	 * @param {Object} headInitialPos 蛇头的初始位置
+	 * @param {Number} id
 	 */
-	constructor(app, headInitialPos) {
+	constructor(app, headInitialPos, id) {
 		this.name = 'Snake';
 		this.head = null;
 		this.bodies = [];
-		this.cate = 1; //类别
+		this.cate = 1; // 类别
 		this.app = app;
 		this.container = new Container();
 		this.bodyContainer = new Container();
-		this.v = 2; //初始速度
+		this.v = 2; // 初始速度
 		this.VEC_MAX = 4;
 		this.VEC_MIN = 2;
 		this.a = 0.1;
@@ -26,6 +28,7 @@ class Snake {
 			x: app.screen.width / 2,
 			y: app.screen.height / 2
 		};
+		this.id = id;
 	}
 	get score() {
 		return this._score;
@@ -38,7 +41,7 @@ class Snake {
 	}
 	init() {
 		const { app, bodies, update, cate, bodyContainer, container, headInitialPos } = this;
-		//边界
+		// 边界
 		const bound = {
 			left: app.screen.width / 2 - _OFFSET_CANVAS_WIDTH / 2,
 			right: app.screen.width / 2 + _OFFSET_CANVAS_WIDTH / 2,
@@ -46,11 +49,11 @@ class Snake {
 			bottom: app.screen.height / 2 + _OFFSET_CANVAS_HEIGHT / 2
 		};
 		this.bound = bound;
-		//蛇头
+		// 蛇头
 		this.head = new SnakeBody(null, cate, 'head', headInitialPos, bound, app.screen.width, app.screen.height);
 		const head = this.head;
 		head.sprite.position.set(app.screen.width / 2, app.screen.height / 2);
-		//蛇身
+		// 蛇身
 		const body1 = new SnakeBody(this.head, cate, 'body', bound);
 		const body2 = new SnakeBody(body1, cate, 'body', bound);
 		const body3 = new SnakeBody(body2, cate, 'body', bound);
@@ -66,10 +69,10 @@ class Snake {
 			bodyContainer.addChild(body.sprite);
 		}
 		const self = this;
-		//订阅更新分数事件，如果吃到食物进行加分，并判断是否需要增加蛇的长度
+		// 订阅更新分数事件，如果吃到食物进行加分，并判断是否需要增加蛇的长度
 		const eventAdapter = {
 			eventHandler(ev) {
-				if (ev.type === 'update-socre') {
+				if (ev.type === UPDATE_SCORE) {
 					self.score += 1;
 				}
 			}
@@ -79,11 +82,11 @@ class Snake {
 		container.addChild(this.head.sprite);
 		app.ticker.add(update, this);
 	}
-	//转向
+	// 转向
 	turnAround(direc) {
 		this.head.setHeadDirec(direc);
 	}
-	//吃掉食物之后，增加一个蛇的长度
+	// 吃掉食物之后，增加一个蛇的长度
 	addBody() {
 		const { cate, bodies, bound, bodyContainer } = this;
 		const precursor = bodies[bodies.length - 1];
@@ -91,7 +94,7 @@ class Snake {
 		bodies.push(body);
 		bodyContainer.addChild(body.sprite);
 	}
-	//每帧更新
+	// 每帧更新
 	update() {
 		this.head.updateHeadDirec();
 		this.head.updateHeadPos(this.v);
@@ -125,15 +128,25 @@ class Snake {
 			}
 		}
 	}
-	getBoundingSphere() {
+	getHeadBoundingSphere() {
 		return this.head.boundingSphere;
 	}
 	/**
 	 * 检查是否与其他蛇碰撞
 	 * @param {Snake} snake
 	 */
-	collide(snake) {
-		Collisition.sphereCollisition(this.getBoundingSphere(), snake.getBoundingSphere());
+	checkCollide(snake) {
+		const headBound = this.getHeadBoundingSphere();
+		for (let i = 0, l = snake.bodies.length; i < l; i++) {
+			if (Collision.sphereCollisition(headBound, snake.bodies.boundingSphere)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	// 发出事件
+	emit() {
+		EventController.publish(new Event(COLLISION));
 	}
 }
 

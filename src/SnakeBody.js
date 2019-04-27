@@ -3,6 +3,7 @@ import { crossProduct, isEqualVector, mode, Sphere } from './Bound';
 import Interpolation from './Interpolation';
 import EventController from './EventController';
 import Event from './Event';
+import { UPDATE_MAP, UPDATE_FOODS } from './constants';
 
 class SnakeBody {
 	/**
@@ -47,6 +48,7 @@ class SnakeBody {
 			this.direc.y = precursor.direc.y;
 			this.sprite.position.set(x, y);
 		}
+		// 蛇身体的包围圆
 		this.boundingSphere = new Sphere(0, 0, sprite.width);
 	}
 	update() {
@@ -88,13 +90,19 @@ class SnakeBody {
 	 * 设置蛇头的插值方向
 	 * @param {Object} direc {x, y}
 	 */
-	setHeadDirec(direc) {		
+	setHeadDirec(direc) {
+		if (this.type !== 'head') {
+			return;
+		}
 		this.direcInterp.setNext(direc);
 	}
 	/**
 	 * 更新蛇头的插值方向
 	 */
 	updateHeadDirec() {
+		if (this.type !== 'head') {
+			return;
+		}
 		const { direcInterp, direc, sprite, bound, pos } = this;
 		const lerpDirec = direcInterp.lerp();
 		direc.x = lerpDirec.x;
@@ -117,6 +125,9 @@ class SnakeBody {
 	 * @param {Object} v 速度 {x, y}
 	 */
 	updateHeadPos(v) {
+		if (this.type !== 'head') {
+			return;
+		}
 		const { sprite, direc, screenPos, pos } = this;
 		const { left, right, top, bottom } = this.bound;
 		let x = pos.x + direc.x * v;
@@ -155,8 +166,8 @@ class SnakeBody {
 		screenPos.y = y;
 		sprite.position.set(screenPos.x, screenPos.y);
 		//通知地图更新位置
-		EventController.publish(new Event('update-map', pos.x, pos.y));
-		EventController.publish(new Event('update-foods', pos.x, pos.y));
+		EventController.publish(new Event(UPDATE_MAP, pos.x, pos.y));
+		EventController.publish(new Event(UPDATE_FOODS, pos.x, pos.y));
 	}
 }
 

@@ -4,6 +4,7 @@ import Event from './Event';
 import EventController from './EventController';
 import Snake from './Snake';
 import FoodsManager from './FoodsManager';
+import SnakeManager from './SnakeManager';
 
 class Game {
 	constructor(app) {
@@ -13,25 +14,33 @@ class Game {
 	init() {
 		this.foodsManager = new FoodsManager(this.app);
 		this.map = new GameMap(this.app);
-		this.snake = new Snake(this.app);
-		this.controller = new Controller(this.app, this.map, this.snake);
+		this.mySnake = new Snake(this.app);
+		this.controller = new Controller(this.app, this.map, this.mySnake);
+		// 初始化地图
 		this.map.init();
+		// 初始化控制器
 		this.controller.init();
-		this.snake.init();
+		// 初始化snake
+		this.mySnake.init();
+		// 
+		SnakeManager.addSnake(this.mySnake);
 		this.foodsManager.init();
 		const {
 			map,
 			controller,
-			snake,
+			mySnake,
 			app,
 			foodsManager
 		} = this;
 		app.stage.addChild(map.sprite);
 		app.stage.addChild(foodsManager.sprite);
 		app.stage.addChild(controller.container);
-		app.stage.addChild(snake.container);
+		app.stage.addChild(mySnake.container);
 		this.initEventListeners();
 	}
+	/**
+	 * 初始化事件
+	 */
 	initEventListeners() {
 		const { app } = this;
 		app.view.addEventListener('pointerenter', (e) => {
@@ -53,7 +62,13 @@ class Game {
 			EventController.publish(new Event('pointerout', e.clientX, e.clientY));
 		});
 	}
+	/**
+	 * 重启游戏
+	 */
 	restart() {}
+	/**
+	 * 启动游戏
+	 */
 	start() {}
 }
 export default Game;

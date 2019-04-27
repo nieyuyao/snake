@@ -6,3 +6,7 @@ export const HORIZONTAL_DIVISION_NUM = 30;	//食物绘图区x方向划分个数
 export const VERTICAL__DIVISION_NUM = 15;	//食物绘图区y方向划分个数
 export const DIVISION_WIDTH = 100;	//划分区域宽高
 export const INITIAL_SNAKE_BODY_NUM = 4; //蛇刚开始时的body数量
+export const UPDATE_SCORE = 'update-socre';
+export const UPDATE_MAP = 'update-map';
+export const UPDATE_FOODS = 'update-foods';
+export const COLLISION = 'collision';

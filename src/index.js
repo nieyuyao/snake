@@ -51,9 +51,10 @@ for (const key in source) {
 	const src = source[key];
 	loader.add(key, src);
 }
-
+// 加载资源
 loader.load(() => {
 	app.stage.removeChild(loadingText);
 	const game = new Game(app);
+	// 启动游戏
 	game.init();
 });

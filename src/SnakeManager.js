@@ -1,5 +1,10 @@
 import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM } from './constants';
 
+/**
+ * 管理游戏中的蛇
+ * 1. 添加蛇
+ * 2. 删除蛇
+ */
 class SnakeManager {
 	constructor(app) {
 		this.name = 'SnakeManager';
@@ -22,11 +27,15 @@ class SnakeManager {
 	 * @param {Snake} snake
 	 */
 	addSnake(snake) {
-		const { division, snakes } = this;
+		const { snakes } = this;
 		snakes.push(snake);
 	}
-	removeSnake() {
+	/**
+	 * 删除蛇
+	 * @param {Snake} snake 
+	 */
+	removeSnake(snake) {
 
 	}
 }
-export default SnakeManager;
+export default new SnakeManager();
