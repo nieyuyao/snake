@@ -7,7 +7,8 @@ import {
 import EventController from './EventController';
 import {
 	_OFFSET_CANVAS_WIDTH,
-	_OFFSET_CANVAS_HEIGHT
+	_OFFSET_CANVAS_HEIGHT,
+	UPDATE_MAP
 } from './constants';
 
 class GameMap {
@@ -24,6 +25,7 @@ class GameMap {
 		this.mapImage = new Image();
 		this.mapImage.src = '../assets/tile_map_1.png';
 		this.mapImage.crossOrigin = '*';
+		// 变换矩阵，用于把
 		this.matrix = new Matrix(1, 0, 0, 1, 0, 0);
 		this.mPoint = new Point();
 	}
@@ -52,7 +54,7 @@ class GameMap {
 		const self = this;
 		const eventAdapter = {
 			eventHandler(ev) {
-				if (ev.type !== 'update-map') {
+				if (ev.type !== UPDATE_MAP) {
 					return;
 				}
 				self.update(ev.point);
@@ -72,11 +74,23 @@ class GameMap {
 			screenWidth,
 			screenHeight,
 			offsetCtx,
-			matrix,
 			mPoint
 		} = this;
-		const { left, right, top, bottom } = this.bound;
-		//判断地图是否已经超出边界
+		this.transformToMapXY(x, y);
+		offsetCtx.clearRect(0, 0, screenWidth, screenHeight);
+		// 矩阵变化，蛇在屏幕中的坐标转化为地图的绝对坐标
+		offsetCtx.drawImage(mapImage, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
+		sprite.texture.update();
+	}
+	/**
+	 * 将蛇的坐标的坐标转化为地图中的绝对坐标
+	 * @param {number} x 蛇头相对于屏幕的坐标x
+	 * @param {number} y 蛇头相对于屏幕的坐标y
+	 */
+	transformToMapXY(x, y) {
+		const { matrix, mPoint, bound, screenWidth, screenHeight } = this;
+		const { left, right, top, bottom } = bound;
+		// 判断地图是否已经超出边界
 		if (x + screenWidth / 2 >= right) {
 			x = right - screenWidth / 2;
 		}
@@ -89,11 +103,8 @@ class GameMap {
 		if (y - screenHeight / 2 <= top) {
 			y = top + screenHeight / 2;
 		}
-		offsetCtx.clearRect(0, 0, screenWidth, screenHeight);
 		const point = new Point(x, y);
 		matrix.apply(point, mPoint);
-		offsetCtx.drawImage(mapImage, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
-		sprite.texture.update();
 	}
 }
 export default GameMap;

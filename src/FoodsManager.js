@@ -19,7 +19,8 @@ import {
 	HORIZONTAL_DIVISION_NUM,
 	VERTICAL__DIVISION_NUM,
 	DIVISION_WIDTH,
-	UPDATE_SCORE
+	UPDATE_SCORE,
+	UPDATE_FOODS
 } from './constants';
 
 class FoodsManager {
@@ -91,7 +92,7 @@ class FoodsManager {
 		const self = this;
 		const eventAdapter = {
 			eventHandler(ev) {
-				if (ev.type !== 'update-foods') {
+				if (ev.type !== UPDATE_FOODS) {
 					return;
 				}
 				self.update(ev.point);
