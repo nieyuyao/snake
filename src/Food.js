@@ -1,4 +1,5 @@
 import Interpolation from './Interpolation';
+
 const tile = {
 	1: {
 		"x": 0,

@@ -1,9 +1,8 @@
 import { Sprite, Texture } from 'pixi.js';
-import { crossProduct, isEqualVector, mode } from './Bound';
+import { crossProduct, isEqualVector, mode, Sphere } from './Bound';
 import Interpolation from './Interpolation';
 import EventController from './EventController';
 import Event from './Event';
-import { Sphere } from './Bound';
 
 class SnakeBody {
 	/**

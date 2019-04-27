@@ -9,6 +9,7 @@ import {
 	_OFFSET_CANVAS_WIDTH,
 	_OFFSET_CANVAS_HEIGHT
 } from './constants';
+
 class GameMap {
 	constructor(app) {
 		this.name = 'gamemap';

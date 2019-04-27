@@ -1,8 +1,9 @@
-import SnakeBody from './SnakeBody';
 import { Container } from 'pixi.js';
+import SnakeBody from './SnakeBody';
 import EventController from './EventController';
 import Collision from './Collision';
 import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM } from './constants';
+
 class Snake {
 	/**
 	 * @param {PIXI.Application} app 
