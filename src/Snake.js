@@ -1,5 +1,6 @@
-import { Container } from 'pixi.js';
+import { Container, Point } from 'pixi.js';
 import SnakeBody from './SnakeBody';
+import SnakeHead from './SnakeHead';
 import EventController from './EventController';
 import Event from './Event';
 import Collision from './Collision';
@@ -32,10 +33,14 @@ class Snake {
 		}
 		this._score = val;
 	}
-	init(id, headPos) {
+	/**
+	 * 初始化
+	 * @param {Number} id
+	 * @param {Point} screenPos 地图坐标
+	 */
+	init(id, screenPos) {
 		this.id = id;
-		this.headInitialPos = headPos;
-		const { bodies, cate, bodyContainer, container, headInitialPos } = this;
+		const { bodies, cate, bodyContainer, container } = this;
 		// 边界
 		const bound = {
 			left: SCREEN.width / 2 - _OFFSET_CANVAS_WIDTH / 2,
@@ -45,7 +50,7 @@ class Snake {
 		};
 		this.bound = bound;
 		// 蛇头
-		this.head = new SnakeBody(null, cate, 'head', headInitialPos, bound, SCREEN.width, SCREEN.height);
+		this.head = new SnakeHead(null, cate, 'head', screenPos, bound, SCREEN.width, SCREEN.height);
 		const head = this.head;
 		head.sprite.position.set(SCREEN.width / 2, SCREEN.height / 2);
 		// 蛇身

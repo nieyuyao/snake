@@ -34,7 +34,8 @@ class Game {
 		app.stage.addChild(map.sprite);
 		app.stage.addChild(foodsManager.sprite);
 		app.stage.addChild(controller.container);
-		this.snakeManager.addSnake(this.mySnake);
+		this.snakeManager.setMySnake(this.mySnake);
+		this.ai.addSnake(new Snake());
 		this.initEventListeners();
 	}
 	/**

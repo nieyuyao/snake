@@ -10,7 +10,6 @@ import Event from './Event';
 import {
 	Sphere
 } from './Bound';
-
 import {
 	FOOD_NUM_MAX,
 	FOOD_NUM_MIN,
@@ -20,7 +19,8 @@ import {
 	VERTICAL__DIVISION_NUM,
 	DIVISION_WIDTH,
 	UPDATE_SCORE,
-	UPDATE_FOODS
+	UPDATE_FOODS,
+	MAP_TO_SCREEN_MATRIX
 } from './constants';
 
 class FoodsManager {
@@ -47,7 +47,6 @@ class FoodsManager {
 		this.mapImage = new Image();
 		this.mapImage.src = '../assets/images.png';
 		this.sprite = null;
-		this.matrix = new Matrix(1, 0, 0, 1, 1100, 550);
 		this.boundingSphere = new Sphere(0, 0, 20);
 		this.mPoint = new Point();
 		this._mPoint = new Point();
@@ -59,7 +58,6 @@ class FoodsManager {
 			offsetCtx,
 			screenWidth,
 			screenHeight,
-			matrix,
 			mPoint,
 			_mPoint,
 			division,
@@ -83,9 +81,8 @@ class FoodsManager {
 			_offsetCtx.drawImage(mapImage, food.imgX, food.imgY, food.w, food.h, food.x, food.y, food.w, food.h);
 		}
 		const point = new Point(400, 200);
-		matrix.apply(point, mPoint);
-		matrix.apply(point, _mPoint);
-		// this.drawFoods(_mPoint);
+		MAP_TO_SCREEN_MATRIX.apply(point, mPoint);
+		MAP_TO_SCREEN_MATRIX.apply(point, _mPoint);
 		offsetCtx.drawImage(_offsetCtx.canvas, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
 		const texture = new Texture.fromCanvas(offsetCtx.canvas);
 		this.sprite = new Sprite(texture);
@@ -233,7 +230,6 @@ class FoodsManager {
 		const {
 			_offsetCtx,
 			offsetCtx,
-			matrix,
 			sprite,
 			screenWidth,
 			screenHeight,
@@ -260,8 +256,8 @@ class FoodsManager {
 			y = top + screenHeight / 2;
 		}
 		const point = new Point(x, y);
-		matrix.apply(point, mPoint);
-		matrix.apply(p, _mPoint);
+		MAP_TO_SCREEN_MATRIX.apply(point, mPoint);
+		MAP_TO_SCREEN_MATRIX.apply(p, _mPoint);
 		this.drawFoods(_mPoint);
 		offsetCtx.clearRect(0, 0, screenWidth, screenHeight);
 		offsetCtx.drawImage(_offsetCtx.canvas, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
