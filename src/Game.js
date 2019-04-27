@@ -5,6 +5,7 @@ import EventController from './EventController';
 import Snake from './Snake';
 import FoodsManager from './FoodsManager';
 import SnakeManager from './SnakeManager';
+import Ai from './Ai';
 
 class Game {
 	constructor(app) {
@@ -17,6 +18,7 @@ class Game {
 		this.mySnake = new Snake();
 		this.controller = new Controller(this.app, this.map, this.mySnake);
 		this.snakeManager = new SnakeManager(this.app);
+		this.ai = new Ai(this.app, this.snakeManager);
 		// 初始化地图
 		this.map.init();
 		// 初始化控制器

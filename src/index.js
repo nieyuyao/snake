@@ -6,7 +6,7 @@ import {
 } from 'pixi.js';
 import Game from './Game';
 import source from './source';
-import { SCREEN } from './constants'
+import { SCREEN, MAP_TO_SCREEN_MATRIX, SCREEN_TO_MAP_MATRIX, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT } from './constants'
  
 const app = new Application({
 	height: 400
@@ -24,8 +24,13 @@ const loadingText = new Text(
 		fill: 'white'
 	})
 );
+
+// 初始化常量
 SCREEN.width = app.screen.width;
 SCREEN.height = app.screen.height;
+MAP_TO_SCREEN_MATRIX.tx = (_OFFSET_CANVAS_WIDTH - SCREEN.width) / 2;
+MAP_TO_SCREEN_MATRIX.ty = (_OFFSET_CANVAS_HEIGHT - SCREEN.height) / 2;
+
 app.start();
 app.ticker.add(() => {
 	if (delta < 600) {

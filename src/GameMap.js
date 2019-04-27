@@ -8,7 +8,8 @@ import EventController from './EventController';
 import {
 	_OFFSET_CANVAS_WIDTH,
 	_OFFSET_CANVAS_HEIGHT,
-	UPDATE_MAP
+	UPDATE_MAP,
+	MAP_TO_SCREEN_MATRIX
 } from './constants';
 
 class GameMap {
@@ -25,8 +26,6 @@ class GameMap {
 		this.mapImage = new Image();
 		this.mapImage.src = '../assets/tile_map_1.png';
 		this.mapImage.crossOrigin = '*';
-		// 变换矩阵，用于把
-		this.matrix = new Matrix(1, 0, 0, 1, 0, 0);
 		this.mPoint = new Point();
 	}
 	init() {
@@ -35,11 +34,8 @@ class GameMap {
 			mapImage,
 			screenWidth,
 			screenHeight,
-			matrix,
 			mPoint
 		} = this;
-		matrix.tx = (_OFFSET_CANVAS_WIDTH - screenWidth) / 2;
-		matrix.ty = (_OFFSET_CANVAS_HEIGHT - screenHeight) / 2;
 		this.bound = {
 			left: screenWidth / 2 - _OFFSET_CANVAS_WIDTH / 2,
 			right: screenWidth / 2 + _OFFSET_CANVAS_WIDTH / 2,
@@ -47,7 +43,7 @@ class GameMap {
 			bottom: screenHeight / 2 + _OFFSET_CANVAS_HEIGHT / 2
 		};
 		const point = new Point(400, 200);
-		matrix.apply(point, mPoint);
+		MAP_TO_SCREEN_MATRIX.apply(point, mPoint);
 		offsetCtx.drawImage(mapImage, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
 		const texture = new Texture.fromCanvas(offsetCtx.canvas);
 		this.sprite = new Sprite(texture);
@@ -88,7 +84,7 @@ class GameMap {
 	 * @param {number} y 蛇头相对于屏幕的坐标y
 	 */
 	transformToMapXY(x, y) {
-		const { matrix, mPoint, bound, screenWidth, screenHeight } = this;
+		const { mPoint, bound, screenWidth, screenHeight } = this;
 		const { left, right, top, bottom } = bound;
 		// 判断地图是否已经超出边界
 		if (x + screenWidth / 2 >= right) {
@@ -104,7 +100,7 @@ class GameMap {
 			y = top + screenHeight / 2;
 		}
 		const point = new Point(x, y);
-		matrix.apply(point, mPoint);
+		MAP_TO_SCREEN_MATRIX.apply(point, mPoint);
 	}
 }
 export default GameMap;

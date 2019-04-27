@@ -1,3 +1,5 @@
+import { Matrix } from 'pixi.js';
+
 export const FOOD_NUM_MAX = 1000;	//食物的最大数量
 export const FOOD_NUM_MIN = 100;	//食物的最小数量
 export const _OFFSET_CANVAS_WIDTH = 3000; //食物绘图离屏canvas的宽
@@ -10,6 +12,9 @@ export const UPDATE_SCORE = 'update-socre';
 export const UPDATE_MAP = 'update-map';
 export const UPDATE_FOODS = 'update-foods';
 export const COLLISION = 'collision';
+export const MAX_PLAYERS_NUM = 30; //最多的玩家数目
+export const MAP_TO_SCREEN_MATRIX = new Matrix(1, 0, 0, 1, 0, 0); // 矩阵 地图坐标=>屏幕坐标
+export const SCREEN_TO_MAP_MATRIX = new Matrix(1, 0, 0, 1, 0, 0); // 矩阵 地图坐标=>屏幕坐标
 export const SCREEN = {
 	width: 0,
 	height: 0

@@ -10,7 +10,7 @@ class Snake {
 	 * @param {Object} headInitialPos 蛇头的初始位置
 	 * @param {Number} id
 	 */
-	constructor(id, headInitialPos) {
+	constructor() {
 		this.name = 'Snake';
 		this.head = null;
 		this.bodies = [];
@@ -22,11 +22,6 @@ class Snake {
 		this.VEC_MIN = 2;
 		this.a = 0.1;
 		this._score = 0;
-		this.headInitialPos = {
-			x: SCREEN.width / 2,
-			y: SCREEN.height / 2
-		};
-		this.id = id;
 	}
 	get score() {
 		return this._score;
@@ -37,7 +32,9 @@ class Snake {
 		}
 		this._score = val;
 	}
-	init() {
+	init(id, headPos) {
+		this.id = id;
+		this.headInitialPos = headPos;
 		const { bodies, cate, bodyContainer, container, headInitialPos } = this;
 		// 边界
 		const bound = {
@@ -140,6 +137,10 @@ class Snake {
 			}
 		}
 		return false;
+	}
+	// 是否快要碰撞
+	isWillCollide() {
+		
 	}
 	// 发出事件
 	emit() {

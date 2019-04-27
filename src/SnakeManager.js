@@ -1,4 +1,4 @@
-import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM } from './constants';
+import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, SCREEN } from './constants';
 
 /**
  * 管理游戏中的蛇
@@ -29,7 +29,8 @@ class SnakeManager {
 	 */
 	addSnake(snake) {
 		const { snakes, app } = this;
-		snake.init();
+		const headPos = this.provideRandomPos();
+		snake.init(snakes.length, headPos);
 		snakes.push(snake);
 		app.stage.addChild(snake.container);
 	}
@@ -38,13 +39,22 @@ class SnakeManager {
 	 * @param {Snake} snake 
 	 */
 	removeSnake(snake) {
-
 	}
+	/**
+	 * 更新每条蛇的位置
+	 */
 	update() {
 		const { snakes } = this;
 		for (let i = 0, l = snakes.length; i < l; i++) {
 			snakes[i].update();
 		}
+	}
+	// 分配一个随机位置
+	provideRandomPos() {
+		// 相对于屏幕的随机位置
+		let x = Math.random() * SCREEN.width;
+		let y = Math.random() * SCREEN.height;
+		return {x, y};
 	}
 }
 export default SnakeManager;
