@@ -6,7 +6,8 @@ import {
 } from 'pixi.js';
 import Game from './Game';
 import source from './source';
-
+import { SCREEN } from './constants'
+ 
 const app = new Application({
 	height: 400
 });
@@ -23,7 +24,8 @@ const loadingText = new Text(
 		fill: 'white'
 	})
 );
-
+SCREEN.width = app.screen.width;
+SCREEN.height = app.screen.height;
 app.start();
 app.ticker.add(() => {
 	if (delta < 600) {

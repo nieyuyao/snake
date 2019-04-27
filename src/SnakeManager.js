@@ -14,21 +14,24 @@ class SnakeManager {
 		this.init();
 	}
 	init() {
-		const { division } = this;
+		const { division, app } = this;
 		for (let i = 0; i < HORIZONTAL_DIVISION_NUM; i++) {
 			for (let j = 0; j < VERTICAL__DIVISION_NUM; j++) {
 				const key = `_${i}_${j}`;
 				division[key] = {};
 			}
 		}
+		app.ticker.add(this.update, this);
 	}
 	/**
 	 * 添加蛇
 	 * @param {Snake} snake
 	 */
 	addSnake(snake) {
-		const { snakes } = this;
+		const { snakes, app } = this;
+		snake.init();
 		snakes.push(snake);
+		app.stage.addChild(snake.container);
 	}
 	/**
 	 * 删除蛇
@@ -37,5 +40,11 @@ class SnakeManager {
 	removeSnake(snake) {
 
 	}
+	update() {
+		const { snakes } = this;
+		for (let i = 0, l = snakes.length; i < l; i++) {
+			snakes[i].update();
+		}
+	}
 }
-export default new SnakeManager();
+export default SnakeManager;

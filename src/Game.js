@@ -14,28 +14,25 @@ class Game {
 	init() {
 		this.foodsManager = new FoodsManager(this.app);
 		this.map = new GameMap(this.app);
-		this.mySnake = new Snake(this.app);
+		this.mySnake = new Snake();
 		this.controller = new Controller(this.app, this.map, this.mySnake);
+		this.snakeManager = new SnakeManager(this.app);
 		// 初始化地图
 		this.map.init();
 		// 初始化控制器
 		this.controller.init();
-		// 初始化snake
-		this.mySnake.init();
-		// 
-		SnakeManager.addSnake(this.mySnake);
+		this.snakeManager.init();
 		this.foodsManager.init();
 		const {
 			map,
 			controller,
-			mySnake,
 			app,
 			foodsManager
 		} = this;
 		app.stage.addChild(map.sprite);
 		app.stage.addChild(foodsManager.sprite);
 		app.stage.addChild(controller.container);
-		app.stage.addChild(mySnake.container);
+		this.snakeManager.addSnake(this.mySnake);
 		this.initEventListeners();
 	}
 	/**

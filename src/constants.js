@@ -10,3 +10,7 @@ export const UPDATE_SCORE = 'update-socre';
 export const UPDATE_MAP = 'update-map';
 export const UPDATE_FOODS = 'update-foods';
 export const COLLISION = 'collision';
+export const SCREEN = {
+	width: 0,
+	height: 0
+};

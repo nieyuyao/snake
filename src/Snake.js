@@ -3,20 +3,18 @@ import SnakeBody from './SnakeBody';
 import EventController from './EventController';
 import Event from './Event';
 import Collision from './Collision';
-import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, COLLISION, UPDATE_SCORE } from './constants';
+import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, COLLISION, UPDATE_SCORE, SCREEN } from './constants';
 
 class Snake {
 	/**
-	 * @param {PIXI.Application} app 
 	 * @param {Object} headInitialPos 蛇头的初始位置
 	 * @param {Number} id
 	 */
-	constructor(app, headInitialPos, id) {
+	constructor(id, headInitialPos) {
 		this.name = 'Snake';
 		this.head = null;
 		this.bodies = [];
 		this.cate = 1; // 类别
-		this.app = app;
 		this.container = new Container();
 		this.bodyContainer = new Container();
 		this.v = 2; // 初始速度
@@ -25,8 +23,8 @@ class Snake {
 		this.a = 0.1;
 		this._score = 0;
 		this.headInitialPos = {
-			x: app.screen.width / 2,
-			y: app.screen.height / 2
+			x: SCREEN.width / 2,
+			y: SCREEN.height / 2
 		};
 		this.id = id;
 	}
@@ -40,19 +38,19 @@ class Snake {
 		this._score = val;
 	}
 	init() {
-		const { app, bodies, update, cate, bodyContainer, container, headInitialPos } = this;
+		const { bodies, cate, bodyContainer, container, headInitialPos } = this;
 		// 边界
 		const bound = {
-			left: app.screen.width / 2 - _OFFSET_CANVAS_WIDTH / 2,
-			right: app.screen.width / 2 + _OFFSET_CANVAS_WIDTH / 2,
-			top: app.screen.height / 2 - _OFFSET_CANVAS_HEIGHT / 2,
-			bottom: app.screen.height / 2 + _OFFSET_CANVAS_HEIGHT / 2
+			left: SCREEN.width / 2 - _OFFSET_CANVAS_WIDTH / 2,
+			right: SCREEN.width / 2 + _OFFSET_CANVAS_WIDTH / 2,
+			top: SCREEN.height / 2 - _OFFSET_CANVAS_HEIGHT / 2,
+			bottom: SCREEN.height / 2 + _OFFSET_CANVAS_HEIGHT / 2
 		};
 		this.bound = bound;
 		// 蛇头
-		this.head = new SnakeBody(null, cate, 'head', headInitialPos, bound, app.screen.width, app.screen.height);
+		this.head = new SnakeBody(null, cate, 'head', headInitialPos, bound, SCREEN.width, SCREEN.height);
 		const head = this.head;
-		head.sprite.position.set(app.screen.width / 2, app.screen.height / 2);
+		head.sprite.position.set(SCREEN.width / 2, SCREEN.height / 2);
 		// 蛇身
 		const body1 = new SnakeBody(this.head, cate, 'body', bound);
 		const body2 = new SnakeBody(body1, cate, 'body', bound);
@@ -80,7 +78,6 @@ class Snake {
 		EventController.subscribe(eventAdapter);
 		container.addChild(bodyContainer);
 		container.addChild(this.head.sprite);
-		app.ticker.add(update, this);
 	}
 	// 转向
 	turnAround(direc) {
