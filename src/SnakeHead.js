@@ -86,19 +86,21 @@ class SnakeHead extends SnakeBody {
 		sprite.position.set(renderPos.x, renderPos.y);
 	}
 	calRenderPos() {
+		let w = SCREEN.width / 2;
+		let h = SCREEN.height / 2;
 		let x = SCREEN.width / 2;
 		let y = SCREEN.height / 2;
 		const {renderPos, screenPos } = this;
 		const { left, right, top, bottom } = this.bound;
-		if (screenPos.x - 400 <= left) {
-			x = 400 + screenPos.x - (left + 400);
-		} else if (screenPos.x + 400 >= right) {
-			x = 400 +  screenPos.x - (right - 400);
+		if (screenPos.x - w <= left) {
+			x = w + screenPos.x - (left + w);
+		} else if (screenPos.x + w >= right) {
+			x = w +  screenPos.x - (right - w);
 		}
-		if (screenPos.y - 200 <= top) {
-			y = 200 + screenPos.y - (top + 200);
-		} else if (screenPos.y + 200 >= bottom) {
-			y = 200 + screenPos.y - (bottom - 200);
+		if (screenPos.y - h <= top) {
+			y = h + screenPos.y - (top + h);
+		} else if (screenPos.y + h >= bottom) {
+			y = h + screenPos.y - (bottom - h);
 		}
 		renderPos.x = x;
 		renderPos.y = y;
