@@ -13,13 +13,27 @@ class Interpolation {
 		if (!this.value) {
 			this.value = this.next;
 		} else {
-			this.value.x = this.value.x + (this.next.x - this.value.x) / this.interval;
-			this.value.y = this.value.y + (this.next.y - this.value.y) / this.interval;
+			if (Math.abs(this.value.x - this.next.x) < 0.0001) {
+				this.value.x = this.next.x;
+			} else {
+				this.value.x = this.value.x + (this.next.x - this.value.x) / this.interval;
+			}
+			if (Math.abs(this.value.y - this.next.y) < 0.0001) {
+				this.value.y = this.next.y;
+			} else {
+				this.value.y = this.value.y + (this.next.y - this.value.y) / this.interval;
+			}
 		}
 		return this.value;
 	}
 	setNext(next) {
 		this.next = next;
+	}
+	setValue(val) {
+		this.value.x = val.x;
+		this.value.y = val.y;
+		this.next.x = val.x;
+		this.next.y = val.y;
 	}
 }
 

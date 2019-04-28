@@ -10,7 +10,7 @@ export const DIVISION_WIDTH = 100;	//划分区域宽高
 export const INITIAL_SNAKE_BODY_NUM = 4; //蛇刚开始时的body数量
 export const MAX_PLAYERS_NUM = 30; //最多的玩家数目
 export const SCREEN_TO_MAP_MATRIX = new Matrix(1, 0, 0, 1, 0, 0); // 矩阵 屏幕坐标(屏幕左上角)=>地图坐标(左上角)
-// export const SCREEN_TO_RENDER_MATRIX = new Matrix(1, 0, 0, 1, 0, 0); //矩阵 屏幕坐标=>渲染坐标
+export const SCREEN_TO_VIEWPORT_MATRIX = new Matrix(1, 0, 0, 1, 0, 0); //矩阵 屏幕坐标(屏幕左上角)=>视口坐标(相对于玩家的蛇，坐标系原点也为屏幕左上角)
 export const UPDATE_SCORE = 'update-socre';
 export const UPDATE_MAP = 'update-map';
 export const UPDATE_FOODS = 'update-foods';

@@ -1,7 +1,8 @@
 import { Sprite, Texture } from 'pixi.js';
-import { crossProduct, Sphere } from '../Bound';
+// eslint-disable-next-line import/no-unresolved
 import SnakeBody from './SnakeBody';
-import { SCREEN } from '../constants';
+import { crossProduct, Sphere } from '../Bound';
+import { SCREEN, SCREEN_TO_VIEWPORT_MATRIX } from '../constants';
 
 /**
  * screenPos {x, y} 屏幕坐标 左上角为坐标原点
@@ -82,13 +83,13 @@ class SnakeHead extends SnakeBody {
 			screenPos.x = x;
 			screenPos.y = bottom - h;
 		}
-		this.calRenderPos();
+		this.calViewPortPos();
 		sprite.position.set(viewPortPos.x, viewPortPos.y);
 	}
 	/**
-	 * 计算渲染位置
+	 * 计算视口位置
 	 */
-	calRenderPos() {
+	calViewPortPos() {
 		let w = SCREEN.width / 2;
 		let h = SCREEN.height / 2;
 		let x = SCREEN.width / 2;

@@ -6,6 +6,9 @@ import Event from '../event/Event';
 import Collision from '../Collision';
 import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, COLLISION, UPDATE_SCORE, SCREEN } from '../constants';
 
+/**
+ * 玩家自己的蛇
+ */
 class Snake {
 	/**
 	 * @param {Object} headInitialPos 蛇头的初始位置

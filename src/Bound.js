@@ -1,3 +1,8 @@
+/**
+ * 向量点乘
+ * @param {Vector} v1 
+ * @param {Vector} v2 
+ */
 export const dotProduct = function (v1, v2) {
 	if (!v1.z) {
 		v1.z = 0;
@@ -7,6 +12,11 @@ export const dotProduct = function (v1, v2) {
 	}
 	return v1.x * v2.x + v1.y + v2.y + v1.z * v2.z;
 };
+/**
+ * 向量叉乘
+ * @param {Vector} v1 
+ * @param {Vector} v2 
+ */
 export const crossProduct = function (v1, v2) {
 	return {
 		x: 0,
@@ -14,13 +24,27 @@ export const crossProduct = function (v1, v2) {
 		z: v1.x * v2.y - v1.y * v2.x
 	}
 };
+/**
+ * 两个向量是否相等
+ * @param {Vector} v1 
+ * @param {Vector} v2 
+ */
 export const isEqualVector = function (v1, v2) {
 	return v1.x === v2.x && v1.y === v2.y;
 }
+/**
+ * 向量的模
+ * @param {Vector} v
+ */
 export const mode = function (v) {
 	return Math.sqrt(v.x * v.x + v.y * v.y);
 }
-
+/**
+ * 包围圆
+ * @param {Number} x 
+ * @param {Number} y 
+ * @param {Number} r 
+ */
 export const Sphere = function (x = 0, y = 0, r = 0) {
 	this.x = x;
 	this.y = y;
@@ -38,7 +62,13 @@ export const Sphere = function (x = 0, y = 0, r = 0) {
 		return (px - x) * (px - x) + (py - y) * (py - y) <= this.r * this.r;
 	}
 }
-
+/**
+ * 包围矩形
+ * @param {Point} p1 
+ * @param {Point} p2 
+ * @param {Point} p3 
+ * @param {Point} p4 
+ */
 export const Rectangle = function (p1 = {
 	x: 0,
 	y: 0
