@@ -4,7 +4,7 @@ import {
 	Matrix,
 	Point
 } from 'pixi.js';
-import EventController from './EventController';
+import EventController from './event/EventController';
 import {
 	_OFFSET_CANVAS_WIDTH,
 	_OFFSET_CANVAS_HEIGHT,

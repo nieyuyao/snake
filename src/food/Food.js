@@ -1,4 +1,4 @@
-import Interpolation from './Interpolation';
+import Interpolation from '../Interpolation';
 
 const tile = {
 	1: {

@@ -1,7 +1,7 @@
 import { Sprite, Texture } from 'pixi.js';
-import { crossProduct, Sphere } from './Bound';
+import { crossProduct, Sphere } from '../Bound';
 import SnakeBody from './SnakeBody';
-import { SCREEN } from './constants';
+import { SCREEN } from '../constants';
 
 /**
  * screenPos {x, y} 屏幕坐标 左上角为坐标原点

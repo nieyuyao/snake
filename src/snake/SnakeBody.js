@@ -1,6 +1,6 @@
 import { Sprite, Texture } from 'pixi.js';
-import { crossProduct, isEqualVector, mode, Sphere } from './Bound';
-import Interpolation from './Interpolation';
+import { crossProduct, isEqualVector, mode, Sphere } from '../Bound';
+import Interpolation from '../Interpolation';
 
 class SnakeBody {
 	/**

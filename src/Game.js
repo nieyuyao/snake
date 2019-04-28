@@ -1,11 +1,11 @@
 import GameMap from './GameMap';
 import Controller from './Controller';
-import Event from './Event';
-import EventController from './EventController';
-import Snake from './Snake';
-import Snake2 from './Snake2';
-import FoodsManager from './FoodsManager';
-import SnakeManager from './SnakeManager';
+import Event from './event/Event';
+import EventController from './event/EventController';
+import Snake from './snake/Snake';
+import Snake2 from './snake/Snake2';
+import FoodsManager from './food/FoodsManager';
+import SnakeManager from './snake/SnakeManager';
 import Ai from './Ai';
 
 class Game {

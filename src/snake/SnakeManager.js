@@ -1,7 +1,7 @@
 import { Point } from 'pixi.js';
-import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, UPDATE_MAP, UPDATE_FOODS, SCREEN_TO_MAP_MATRIX } from './constants';
-import EventController from './EventController';
-import Event from './Event';
+import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, UPDATE_MAP, UPDATE_FOODS, SCREEN_TO_MAP_MATRIX } from '../constants';
+import EventController from '../event/EventController';
+import Event from '../event/Event';
 
 /**
  * 管理游戏中的蛇

@@ -5,11 +5,11 @@ import {
 	Matrix
 } from 'pixi.js';
 import Food from './Food';
-import EventController from './EventController';
-import Event from './Event';
+import EventController from '../event/EventController';
+import Event from '../event/Event';
 import {
 	Sphere
-} from './Bound';
+} from '../Bound';
 import {
 	FOOD_NUM_MAX,
 	FOOD_NUM_MIN,
@@ -22,7 +22,7 @@ import {
 	UPDATE_FOODS,
 	SCREEN_TO_MAP_MATRIX,
 	SCREEN
-} from './constants';
+} from '../constants';
 
 class FoodsManager {
 	constructor(app) {

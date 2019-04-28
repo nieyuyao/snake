@@ -1,6 +1,6 @@
 import Snake from './Snake';
 import SnakeHead from './SnakeHead';
-import { SCREEN, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM } from './constants';
+import { SCREEN, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM } from '../constants';
 import SnakeBody from './SnakeBody';
 
 class SnakeHead2 extends SnakeHead {

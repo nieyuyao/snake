@@ -1,10 +1,10 @@
 import { Container, Point } from 'pixi.js';
 import SnakeBody from './SnakeBody';
 import SnakeHead from './SnakeHead';
-import EventController from './EventController';
-import Event from './Event';
-import Collision from './Collision';
-import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, COLLISION, UPDATE_SCORE, SCREEN } from './constants';
+import EventController from '../event/EventController';
+import Event from '../event/Event';
+import Collision from '../Collision';
+import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, COLLISION, UPDATE_SCORE, SCREEN } from '../constants';
 
 class Snake {
 	/**
