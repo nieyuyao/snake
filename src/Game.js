@@ -3,6 +3,7 @@ import Controller from './Controller';
 import Event from './Event';
 import EventController from './EventController';
 import Snake from './Snake';
+import Snake2 from './Snake2';
 import FoodsManager from './FoodsManager';
 import SnakeManager from './SnakeManager';
 import Ai from './Ai';
@@ -35,7 +36,7 @@ class Game {
 		app.stage.addChild(foodsManager.sprite);
 		app.stage.addChild(controller.container);
 		this.snakeManager.setMySnake(this.mySnake);
-		this.ai.addSnake(new Snake());
+		this.ai.addSnake(new Snake2());
 		this.initEventListeners();
 	}
 	/**

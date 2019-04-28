@@ -4,15 +4,15 @@ import SnakeBody from './SnakeBody';
 import { SCREEN } from './constants';
 
 /**
- * screenPos {x, y} 屏幕坐标 屏幕中间为远点
- * renderPos {x, y} 渲染坐标 以屏幕左下角为远点
+ * screenPos {x, y} 屏幕坐标 左上角为坐标原点
+ * viewPortPos {x, y} 视口坐标 以屏幕左上角为原点, 限制蛇头在视口区域
  */
 class SnakeHead extends SnakeBody {
 	constructor(precursor, cate = 1, type, intialScreenPos, bound = {left: 0, right: 0, top: 0, bottom: 0}) {
 		super(precursor, cate, type, bound);
 		this.name = 'SnakeHead';
 		this.screenPos = intialScreenPos;
-		this.renderPos = {
+		this.viewPortPos = {
 			x: SCREEN.width / 2,
 			y: SCREEN.height / 2
 		};
@@ -60,7 +60,7 @@ class SnakeHead extends SnakeBody {
 	 * @param {Object} v 速度 {x, y}
 	 */
 	updateHeadPos(v) {
-		const { sprite, direc, renderPos, screenPos } = this;
+		const { sprite, direc, viewPortPos, screenPos } = this;
 		const { left, right, top, bottom } = this.bound;
 		let x = screenPos.x + direc.x * v;
 		let y = screenPos.y + direc.y * v;
@@ -83,14 +83,17 @@ class SnakeHead extends SnakeBody {
 			screenPos.y = bottom - h;
 		}
 		this.calRenderPos();
-		sprite.position.set(renderPos.x, renderPos.y);
+		sprite.position.set(viewPortPos.x, viewPortPos.y);
 	}
+	/**
+	 * 计算渲染位置
+	 */
 	calRenderPos() {
 		let w = SCREEN.width / 2;
 		let h = SCREEN.height / 2;
 		let x = SCREEN.width / 2;
 		let y = SCREEN.height / 2;
-		const {renderPos, screenPos } = this;
+		const {viewPortPos, screenPos } = this;
 		const { left, right, top, bottom } = this.bound;
 		if (screenPos.x - w <= left) {
 			x = w + screenPos.x - (left + w);
@@ -102,8 +105,8 @@ class SnakeHead extends SnakeBody {
 		} else if (screenPos.y + h >= bottom) {
 			y = h + screenPos.y - (bottom - h);
 		}
-		renderPos.x = x;
-		renderPos.y = y;
+		viewPortPos.x = x;
+		viewPortPos.y = y;
 	}
 }
 

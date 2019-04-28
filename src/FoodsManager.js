@@ -20,7 +20,8 @@ import {
 	DIVISION_WIDTH,
 	UPDATE_SCORE,
 	UPDATE_FOODS,
-	MAP_TO_SCREEN_MATRIX
+	SCREEN_TO_MAP_MATRIX,
+	SCREEN
 } from './constants';
 
 class FoodsManager {
@@ -32,8 +33,6 @@ class FoodsManager {
 		this.bound = null; //裁剪区的边界
 		this.timer = -1; //计时器
 		this.delay = -1; //计时器间隔
-		this.screenWidth = app.screen.width;
-		this.screenHeight = app.screen.height;
 
 		let _offsetCanvas = document.createElement('canvas'); //用来画食物的离屏canvas
 		_offsetCanvas.width = _OFFSET_CANVAS_WIDTH;
@@ -56,18 +55,16 @@ class FoodsManager {
 		const {
 			_offsetCtx,
 			offsetCtx,
-			screenWidth,
-			screenHeight,
 			mPoint,
 			_mPoint,
 			division,
 			mapImage
 		} = this;
 		this.bound = {
-			left: screenWidth / 2 - _OFFSET_CANVAS_WIDTH / 2,
-			right: screenWidth / 2 + _OFFSET_CANVAS_WIDTH / 2,
-			top: screenHeight / 2 - _OFFSET_CANVAS_HEIGHT / 2,
-			bottom: screenHeight / 2 + _OFFSET_CANVAS_HEIGHT / 2
+			left: SCREEN.width / 2 - _OFFSET_CANVAS_WIDTH / 2,
+			right: SCREEN.width / 2 + _OFFSET_CANVAS_WIDTH / 2,
+			top: SCREEN.height / 2 - _OFFSET_CANVAS_HEIGHT / 2,
+			bottom: SCREEN.height / 2 + _OFFSET_CANVAS_HEIGHT / 2
 		};
 		//将食物绘图区划分为30*15份100*100的区域
 		for (let i = 0; i < HORIZONTAL_DIVISION_NUM; i++) {
@@ -81,9 +78,9 @@ class FoodsManager {
 			_offsetCtx.drawImage(mapImage, food.imgX, food.imgY, food.w, food.h, food.x, food.y, food.w, food.h);
 		}
 		const point = new Point(400, 200);
-		MAP_TO_SCREEN_MATRIX.apply(point, mPoint);
-		MAP_TO_SCREEN_MATRIX.apply(point, _mPoint);
-		offsetCtx.drawImage(_offsetCtx.canvas, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
+		SCREEN_TO_MAP_MATRIX.apply(point, mPoint); //渲染坐标 => 地图坐标
+		SCREEN_TO_MAP_MATRIX.apply(point, _mPoint); //渲染坐标 => 地图坐标
+		offsetCtx.drawImage(_offsetCtx.canvas, mPoint.x - SCREEN.width / 2, mPoint.y - SCREEN.height / 2, SCREEN.width, SCREEN.height, 0, 0, SCREEN.width, SCREEN.height);
 		const texture = new Texture.fromCanvas(offsetCtx.canvas);
 		this.sprite = new Sprite(texture);
 		const self = this;
@@ -231,8 +228,6 @@ class FoodsManager {
 			_offsetCtx,
 			offsetCtx,
 			sprite,
-			screenWidth,
-			screenHeight,
 			mPoint,
 			_mPoint
 		} = this;
@@ -242,25 +237,25 @@ class FoodsManager {
 			top,
 			bottom
 		} = this.bound;
-		//判断地图是否已经超出边界
-		if (x + screenWidth / 2 >= right) {
-			x = right - screenWidth / 2;
+		// 判断是否已经超出地图边界
+		if (x + SCREEN.width / 2 >= right) {
+			x = right - SCREEN.width / 2;
 		}
-		if (x - screenWidth / 2 <= left) {
-			x = left + screenWidth / 2;
+		if (x - SCREEN.width / 2 <= left) {
+			x = left + SCREEN.width / 2;
 		}
-		if (y + screenHeight / 2 >= bottom) {
-			y = bottom - screenHeight / 2;
+		if (y + SCREEN.height / 2 >= bottom) {
+			y = bottom - SCREEN.height / 2;
 		}
-		if (y - screenHeight / 2 <= top) {
-			y = top + screenHeight / 2;
+		if (y - SCREEN.height / 2 <= top) {
+			y = top + SCREEN.height / 2;
 		}
 		const point = new Point(x, y);
-		MAP_TO_SCREEN_MATRIX.apply(point, mPoint);
-		MAP_TO_SCREEN_MATRIX.apply(p, _mPoint);
+		SCREEN_TO_MAP_MATRIX.apply(point, mPoint);
+		SCREEN_TO_MAP_MATRIX.apply(p, _mPoint);
 		this.drawFoods(_mPoint);
-		offsetCtx.clearRect(0, 0, screenWidth, screenHeight);
-		offsetCtx.drawImage(_offsetCtx.canvas, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
+		offsetCtx.clearRect(0, 0, SCREEN.width, SCREEN.height);
+		offsetCtx.drawImage(_offsetCtx.canvas, mPoint.x - SCREEN.width / 2, mPoint.y - SCREEN.height / 2, SCREEN.width, SCREEN.height, 0, 0, SCREEN.width, SCREEN.height);
 		sprite.texture.update();
 	}
 }

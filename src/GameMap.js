@@ -9,7 +9,7 @@ import {
 	_OFFSET_CANVAS_WIDTH,
 	_OFFSET_CANVAS_HEIGHT,
 	UPDATE_MAP,
-	MAP_TO_SCREEN_MATRIX
+	SCREEN_TO_MAP_MATRIX
 } from './constants';
 
 class GameMap {
@@ -43,7 +43,7 @@ class GameMap {
 			bottom: screenHeight / 2 + _OFFSET_CANVAS_HEIGHT / 2
 		};
 		const point = new Point(400, 200);
-		MAP_TO_SCREEN_MATRIX.apply(point, mPoint);
+		SCREEN_TO_MAP_MATRIX.apply(point, mPoint); // 屏幕坐标 => 地图坐标
 		offsetCtx.drawImage(mapImage, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
 		const texture = new Texture.fromCanvas(offsetCtx.canvas);
 		this.sprite = new Sprite(texture);
@@ -100,7 +100,7 @@ class GameMap {
 			y = top + screenHeight / 2;
 		}
 		const point = new Point(x, y);
-		MAP_TO_SCREEN_MATRIX.apply(point, mPoint);
+		SCREEN_TO_MAP_MATRIX.apply(point, mPoint);
 	}
 }
 export default GameMap;

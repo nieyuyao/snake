@@ -51,8 +51,8 @@ class Snake {
 		this.bound = bound;
 		// 蛇头
 		this.head = new SnakeHead(null, cate, 'head', screenPos, bound, SCREEN.width, SCREEN.height);
-		const head = this.head;
-		head.sprite.position.set(SCREEN.width / 2, SCREEN.height / 2);
+		// const head = this.head;
+		// head.sprite.position.set(SCREEN.width / 2, SCREEN.height / 2);
 		// 蛇身
 		const body1 = new SnakeBody(this.head, cate, 'body', bound);
 		const body2 = new SnakeBody(body1, cate, 'body', bound);

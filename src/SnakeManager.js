@@ -1,5 +1,5 @@
 import { Point } from 'pixi.js';
-import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, UPDATE_MAP, UPDATE_FOODS, SCREEN, MAP_TO_SCREEN_MATRIX } from './constants';
+import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, UPDATE_MAP, UPDATE_FOODS, SCREEN_TO_MAP_MATRIX } from './constants';
 import EventController from './EventController';
 import Event from './Event';
 
@@ -50,7 +50,7 @@ class SnakeManager {
 	update() {
 		if (this.mySnake) {
 			this.mySnake.update();
-			const pos = this.mySnake.head.screenPos;
+			const pos = this.mySnake.head.screenPos; // 屏幕坐标
 			EventController.publish(new Event(UPDATE_MAP, pos.x, pos.y));
 			EventController.publish(new Event(UPDATE_FOODS, pos.x, pos.y));
 		}
@@ -64,9 +64,10 @@ class SnakeManager {
 	 */
 	provideRandomPos() {
 		// 随机的屏幕坐标
-		let x = -(_OFFSET_CANVAS_WIDTH - SCREEN.width) / 2 + Math.random() * _OFFSET_CANVAS_WIDTH;
-		let y = -(_OFFSET_CANVAS_HEIGHT - SCREEN.height) / 2 + Math.random() * _OFFSET_CANVAS_HEIGHT;
-		return new Point(x, y);
+		let x = Math.random() * _OFFSET_CANVAS_WIDTH;
+		let y = Math.random() * _OFFSET_CANVAS_HEIGHT;
+		const p1 = new Point(x, y);
+		return SCREEN_TO_MAP_MATRIX.applyInverse(p1);
 	}
 	/**
 	 * 设置玩家的蛇
@@ -74,8 +75,8 @@ class SnakeManager {
 	 */
 	setMySnake(snake) {
 		this.mySnake = snake;
-		const headMapPos = this.provideRandomPos();
-		this.mySnake.init(-1, headMapPos);
+		const screenPos = this.provideRandomPos();
+		this.mySnake.init(-1, screenPos);
 		this.app.stage.addChild(snake.container);
 	}
 }
