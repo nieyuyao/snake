@@ -13,6 +13,8 @@ class SnakeHead extends SnakeBody {
 		super(precursor, cate, type, bound);
 		this.name = 'SnakeHead';
 		this.screenPos = intialScreenPos;
+		SCREEN_TO_VIEWPORT_MATRIX.tx = intialScreenPos.x;
+		SCREEN_TO_VIEWPORT_MATRIX.ty = intialScreenPos.y;
 		this.viewPortPos = {
 			x: SCREEN.width / 2,
 			y: SCREEN.height / 2

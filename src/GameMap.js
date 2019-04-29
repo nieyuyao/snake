@@ -1,7 +1,6 @@
 import {
 	Texture,
 	Sprite,
-	Matrix,
 	Point
 } from 'pixi.js';
 import EventController from './event/EventController';

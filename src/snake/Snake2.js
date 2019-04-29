@@ -1,7 +1,7 @@
 import Snake from './Snake';
 import SnakeHead from './SnakeHead';
 import { crossProduct } from '../Bound'
-import { SCREEN, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM } from '../constants';
+import { SCREEN, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SCREEN_TO_VIEWPORT_MATRIX } from '../constants';
 import SnakeBody from './SnakeBody';
 
 /**
@@ -11,35 +11,6 @@ class SnakeHead2 extends SnakeHead {
 	constructor(precursor, cate = 1, type, headInitialPos, bound = {left: 0, right: 0, top: 0, bottom: 0}) {
 		super(precursor, cate, type, headInitialPos, bound);
 		this.name = 'SnakeHead2';
-	}
-	/**
-	 * 更新蛇头的位置,覆盖父类的方法
-	 * @param {Object} v 速度 {x, y}
-	 */
-	updateHeadPos(v) {
-		const { sprite, direc, screenPos } = this;
-		const { left, right, top, bottom } = this.bound;
-		let x = screenPos.x + direc.x * v;
-		let y = screenPos.y + direc.y * v;
-		const w = sprite.width / 2;
-		const h = sprite.height / 2;
-		screenPos.x = x;
-		screenPos.y = y;
-		if (x - w <= left) {
-			screenPos.x = left + w;
-			screenPos.y = y;
-		} else if (x + w >= right) {
-			screenPos.x = right - w;
-			screenPos.y = y;
-		}
-		if (y - h <= top) {
-			screenPos.x = x;
-			screenPos.y = top + h;
-		} else if (y + h >= bottom) {
-			screenPos.x = x;
-			screenPos.y = bottom - h;
-		}
-		sprite.position.set(screenPos.x, screenPos.y);
 	}
 	/**
 	 * 更新蛇头的位置,覆盖父类的方法
@@ -71,6 +42,12 @@ class SnakeHead2 extends SnakeHead {
 		}
 		const cross = crossProduct({x: 1, y: 0}, direc);
 		sprite.rotation = cross.z > 0 ? cosval : -1 * cosval;
+	}
+	calViewPortPos() {
+		const { screenPos, viewPortPos } = this;
+		const p = SCREEN_TO_VIEWPORT_MATRIX.apply(screenPos);
+		viewPortPos.x = p.x;
+		viewPortPos.y = p.y;
 	}
 }
 class Snake2 extends Snake {
