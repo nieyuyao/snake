@@ -1,7 +1,7 @@
 import Snake from './Snake';
 import SnakeHead from './SnakeHead';
-import { crossProduct } from '../Bound'
-import { SCREEN, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SCREEN_TO_VIEWPORT_MATRIX } from '../constants';
+import { crossProduct } from '../utils/Bound'
+import { SCREEN, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SCREEN_TO_VIEWPORT_MATRIX } from '../utils/constants';
 import SnakeBody from './SnakeBody';
 
 /**

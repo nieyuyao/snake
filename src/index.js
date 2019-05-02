@@ -6,7 +6,7 @@ import {
 } from 'pixi.js';
 import Game from './Game';
 import source from './source';
-import { SCREEN, SCREEN_TO_MAP_MATRIX, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT } from './constants'
+import { SCREEN, SCREEN_TO_MAP_MATRIX, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT } from './utils/constants'
  
 const app = new Application({
 	height: 400

@@ -1,6 +1,6 @@
 import { Sprite, Texture } from 'pixi.js';
-import { crossProduct, isEqualVector, mode, Sphere } from '../Bound';
-import Interpolation from '../Interpolation';
+import { crossProduct, isEqualVector, Sphere } from '../utils/Bound';
+import Interpolation from '../utils/Interpolation';
 
 class SnakeBody {
 	/**
@@ -32,6 +32,7 @@ class SnakeBody {
 		this.direc.x = precursor.direc.x;
 		this.direc.y = precursor.direc.y;
 		this.sprite.position.set(x, y);
+		this.sprite.name = 'SnakeBody';
 		// 蛇身体的包围圆
 		this.boundingSphere = new Sphere(0, 0, sprite.width);
 	}

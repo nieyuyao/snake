@@ -1,5 +1,5 @@
-import { Point } from 'pixi.js';
-import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, UPDATE_MAP, UPDATE_FOODS, SCREEN_TO_MAP_MATRIX } from '../constants';
+import { Point, Container } from 'pixi.js';
+import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, UPDATE_MY_SNAKE } from '../utils/constants';
 import EventController from '../event/EventController';
 import Event from '../event/Event';
 
@@ -9,34 +9,35 @@ import Event from '../event/Event';
  * 2. 删除蛇
  */
 class SnakeManager {
-	constructor(app) {
+	constructor() {
 		this.name = 'SnakeManager';
-		this.app = app;
 		this.division = {};
 		this.snakes = [];
-		this.init();
 		this.mySnake = null;
+		this.container = new Container();
 	}
 	init() {
-		const { division, app } = this;
+		const { division, container } = this;
 		for (let i = 0; i < HORIZONTAL_DIVISION_NUM; i++) {
 			for (let j = 0; j < VERTICAL__DIVISION_NUM; j++) {
 				const key = `_${i}_${j}`;
 				division[key] = {};
 			}
 		}
-		app.ticker.add(this.update, this);
+		// 初始化容器
+		container.position.set(0, 0);
+		container.name = 'SnakeManager';
 	}
 	/**
 	 * 添加蛇
 	 * @param {Snake} snake
 	 */
 	addSnake(snake) {
-		const { snakes, app } = this;
-		const screenPos = this.provideRandomPos();
-		snake.init(snakes.length, screenPos);
+		const { snakes, container } = this;
+		const pos = this.getRandomPos();
+		snake.init(snakes.length, pos);
 		snakes.push(snake);
-		app.stage.addChild(snake.container);
+		container.addChild(snake.container);
 	}
 	/**
 	 * 删除蛇
@@ -50,9 +51,9 @@ class SnakeManager {
 	update() {
 		if (this.mySnake) {
 			this.mySnake.update();
-			const pos = this.mySnake.head.screenPos; // 屏幕坐标
-			EventController.publish(new Event(UPDATE_MAP, pos.x, pos.y));
-			EventController.publish(new Event(UPDATE_FOODS, pos.x, pos.y));
+			const pos = this.mySnake.head.pos; // 屏幕坐标
+			EventController.publish(new Event(UPDATE_MY_SNAKE, pos.x, pos.y));
+			// EventController.publish(new Event(UPDATE_FOODS, pos.x, pos.y));
 		}
 		const { snakes } = this;
 		for (let i = 0, l = snakes.length; i < l; i++) {
@@ -62,12 +63,11 @@ class SnakeManager {
 	/**
 	 * 分配一个随机位置(绝对坐标, 地图坐标)
 	 */
-	provideRandomPos() {
+	getRandomPos() {
 		// 随机的屏幕坐标
 		let x = Math.random() * _OFFSET_CANVAS_WIDTH;
 		let y = Math.random() * _OFFSET_CANVAS_HEIGHT;
-		const p1 = new Point(x, y);
-		return SCREEN_TO_MAP_MATRIX.applyInverse(p1);
+		return new Point(x, y);
 	}
 	/**
 	 * 设置玩家的蛇
@@ -75,9 +75,7 @@ class SnakeManager {
 	 */
 	setMySnake(snake) {
 		this.mySnake = snake;
-		const screenPos = this.provideRandomPos();
-		this.mySnake.init(-1, screenPos);
-		this.app.stage.addChild(snake.container);
+		this.addSnake(snake);
 	}
 }
 export default SnakeManager;

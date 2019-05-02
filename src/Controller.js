@@ -5,7 +5,7 @@ import {
 	Matrix
 } from 'pixi.js';
 import EventController from './event/EventController';
-import { Sphere } from './Bound';
+import { Sphere } from './utils/Bound';
 
 class Controller {
 	constructor(app, map, snake) {

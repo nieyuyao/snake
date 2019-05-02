@@ -1,105 +1,97 @@
 import {
-	Texture,
+	Container,
 	Sprite,
-	Point
+	Point,
+	Texture
 } from 'pixi.js';
 import EventController from './event/EventController';
 import {
 	_OFFSET_CANVAS_WIDTH,
 	_OFFSET_CANVAS_HEIGHT,
-	UPDATE_MAP,
-	SCREEN_TO_MAP_MATRIX
-} from './constants';
+	SCREEN
+} from './utils/constants';
 
 class GameMap {
-	constructor(app) {
+	constructor() {
 		this.name = 'gamemap';
-		this.sprite = null;
-		this.screenWidth = app.screen.width;
-		this.screenHeight = app.screen.height;
-		//创建离屏canvas
-		const offsetCanvas = document.createElement('canvas');
-		offsetCanvas.width = this.screenWidth;
-		offsetCanvas.height = this.screenHeight;
-		this.offsetCtx = offsetCanvas.getContext('2d');
-		this.mapImage = new Image();
-		this.mapImage.src = '../assets/tile_map_1.png';
-		this.mapImage.crossOrigin = '*';
 		this.mPoint = new Point();
+		this.bound = null;
+		this.fm = null; // 食物管理器
+		this.sm = null; // 蛇管理器
+		this.mapSprite = new Sprite(); //地图
+		this.container = new Container();
+		this.mySnake = null;
 	}
-	init() {
-		const {
-			offsetCtx,
-			mapImage,
-			screenWidth,
-			screenHeight,
-			mPoint
-		} = this;
+	/**
+	 * 初始化
+	 * @param {FoodManager} fm
+	 * @param {SnakeManager} sm
+	 * @param {Snake} mySnake
+	 */
+	init(fm, sm, mySnake) {
+		this.fm = fm;
+		this.sm = sm;
+		this.mySnake = mySnake;
+		const { container, mapSprite } = this;
+		// 初始化mapSprite
+		mapSprite.texture = Texture.fromImage('../assets/tile_map_1.png');
+		mapSprite.name = 'MapSprite';
+		// 初始化容器
+		container.addChild(mapSprite);
+		container.addChild(fm.container);
+		container.addChild(sm.container);
+		container.name = 'GameMap';
+		// 边界范围
 		this.bound = {
-			left: screenWidth / 2 - _OFFSET_CANVAS_WIDTH / 2,
-			right: screenWidth / 2 + _OFFSET_CANVAS_WIDTH / 2,
-			top: screenHeight / 2 - _OFFSET_CANVAS_HEIGHT / 2,
-			bottom: screenHeight / 2 + _OFFSET_CANVAS_HEIGHT / 2
+			left: 0,
+			right: _OFFSET_CANVAS_WIDTH,
+			top: 0,
+			bottom: _OFFSET_CANVAS_HEIGHT
 		};
-		const point = new Point(400, 200);
-		SCREEN_TO_MAP_MATRIX.apply(point, mPoint); // 屏幕坐标 => 地图坐标
-		offsetCtx.drawImage(mapImage, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
-		const texture = new Texture.fromCanvas(offsetCtx.canvas);
-		this.sprite = new Sprite(texture);
-		const self = this;
-		const eventAdapter = {
-			eventHandler(ev) {
-				if (ev.type !== UPDATE_MAP) {
-					return;
-				}
-				self.update(ev.point);
-			}
-		}
-		EventController.subscribe(eventAdapter);
 	}
 	/**
 	 * 更新地图
-	 * @param {Object} p 当前蛇头的位置{x, y}
+	 * @param {Point} p 当前蛇头的位置{x, y}
 	 */
-	update(p) {
-		let { x, y } = p; //x, y为图片裁剪区的中心
-		const {
-			sprite,
-			mapImage,
-			screenWidth,
-			screenHeight,
-			offsetCtx,
-			mPoint
-		} = this;
-		this.transformToMapXY(x, y);
-		offsetCtx.clearRect(0, 0, screenWidth, screenHeight);
-		// 矩阵变化，蛇在屏幕中的坐标转化为地图的绝对坐标
-		offsetCtx.drawImage(mapImage, mPoint.x - screenWidth / 2, mPoint.y - screenHeight / 2, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight);
-		sprite.texture.update();
+	update() {
+		this.fm.update();
+		this.sm.update();
+		// 更新container位置
+		this.calcMapCoorFromSnake();
+		this.container.x = this.mPoint.x;
+		this.container.y = this.mPoint.y;
 	}
 	/**
-	 * 将蛇的坐标的坐标转化为地图中的绝对坐标
-	 * @param {number} x 蛇头相对于屏幕的坐标x
-	 * @param {number} y 蛇头相对于屏幕的坐标y
+	 * 通过玩家自己的蛇的蛇头坐标(**绝对坐标**)计算出当前需要从地图上截取区域的中心位置
+	 * @param {Point} sp 玩家自己的蛇的蛇头坐标
 	 */
-	transformToMapXY(x, y) {
-		const { mPoint, bound, screenWidth, screenHeight } = this;
+	calcMapCoorFromSnake() {
+		const { mPoint, bound, mySnake } = this;
+		let { x, y } = mySnake.head.pos;
 		const { left, right, top, bottom } = bound;
 		// 判断地图是否已经超出边界
-		if (x + screenWidth / 2 >= right) {
-			x = right - screenWidth / 2;
+		// 计算x
+		if (x + SCREEN.width / 2 >= right) {
+			x = right - SCREEN.width;
 		}
-		if (x - screenWidth / 2 <= left) {
-			x = left + screenWidth / 2;
+		else if (x - SCREEN.width / 2 <= left) {
+			x = left;
+		} 
+		else {
+			x = x - SCREEN.width / 2;
 		}
-		if (y + screenHeight / 2 >= bottom) {
-			y = bottom - screenHeight / 2;
+		// 计算y
+		if (y + SCREEN.height / 2 >= bottom) {
+			y = bottom - SCREEN.height;
 		}
-		if (y - screenHeight / 2 <= top) {
-			y = top + screenHeight / 2;
+		else if (y - SCREEN.height / 2 <= top) {
+			y = top;
 		}
-		const point = new Point(x, y);
-		SCREEN_TO_MAP_MATRIX.apply(point, mPoint);
+		else {
+			y = y - SCREEN.height / 2;
+		}
+		mPoint.x = -x;
+		mPoint.y = -y;
 	}
 }
 export default GameMap;

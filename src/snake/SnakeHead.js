@@ -1,24 +1,12 @@
 import { Sprite, Texture } from 'pixi.js';
-// eslint-disable-next-line import/no-unresolved
 import SnakeBody from './SnakeBody';
-import { crossProduct, Sphere } from '../Bound';
-import { SCREEN, SCREEN_TO_VIEWPORT_MATRIX } from '../constants';
+import { crossProduct, Sphere } from '../utils/Bound';
 
-/**
- * screenPos {x, y} 屏幕坐标 左上角为坐标原点
- * viewPortPos {x, y} 视口坐标 以屏幕左上角为原点, 限制蛇头在视口区域
- */
 class SnakeHead extends SnakeBody {
-	constructor(precursor, cate = 1, type, intialScreenPos, bound = {left: 0, right: 0, top: 0, bottom: 0}) {
+	constructor(precursor, cate = 1, type, startPos, bound = {left: 0, right: 0, top: 0, bottom: 0}) {
 		super(precursor, cate, type, bound);
 		this.name = 'SnakeHead';
-		this.screenPos = intialScreenPos;
-		SCREEN_TO_VIEWPORT_MATRIX.tx = intialScreenPos.x;
-		SCREEN_TO_VIEWPORT_MATRIX.ty = intialScreenPos.y;
-		this.viewPortPos = {
-			x: SCREEN.width / 2,
-			y: SCREEN.height / 2
-		};
+		this.pos = startPos;
 		this.init();
 	}
 	init() {
@@ -26,9 +14,9 @@ class SnakeHead extends SnakeBody {
 		this.sprite = new Sprite(Texture.fromFrame(frame));
 		this.sprite.scale.set(0.4, 0.4);
 		this.sprite.anchor.set(0.5, 0.5);
-		const { sprite } = this;
+		this.sprite.name = 'SnakeHead';
 		// 蛇身体的包围圆
-		this.boundingSphere = new Sphere(0, 0, sprite.width);
+		this.boundingSphere = new Sphere(0, 0, this.sprite.width);
 	}
 	/**
 	 * 设置蛇头的插值方向
@@ -41,14 +29,14 @@ class SnakeHead extends SnakeBody {
 	 * 更新蛇头的插值方向
 	 */
 	updateHeadDirec() {
-		const { direcInterp, direc, sprite, bound, screenPos } = this;
+		const { direcInterp, direc, sprite, bound, pos } = this;
 		const lerpDirec = direcInterp.lerp();
 		direc.x = lerpDirec.x;
 		direc.y = lerpDirec.y;
 		const cosval = Math.acos(direc.x);
 		const w = sprite.width / 2;
 		const h = w;
-		const { x, y } = screenPos;
+		const { x, y } = pos;
 		if ((x - w <= bound.left && direc.x < 0) || (x + w >= bound.right && direc.x > 0)) {
 			//到达左边缘
 			direc.x = 0;
@@ -63,53 +51,29 @@ class SnakeHead extends SnakeBody {
 	 * @param {Object} v 速度 {x, y}
 	 */
 	updateHeadPos(v) {
-		const { sprite, direc, viewPortPos, screenPos } = this;
+		const { sprite, direc, pos } = this;
 		const { left, right, top, bottom } = this.bound;
-		let x = screenPos.x + direc.x * v;
-		let y = screenPos.y + direc.y * v;
+		let x = pos.x + direc.x * v;
+		let y = pos.y + direc.y * v;
 		const w = sprite.width / 2;
 		const h = sprite.height / 2;
-		screenPos.x = x;
-		screenPos.y = y;
+		pos.x = x;
+		pos.y = y;
 		if (x - w <= left) {
-			screenPos.x = left + w;
-			screenPos.y = y;
+			pos.x = left + w;
+			pos.y = y;
 		} else if (x + w >= right) {
-			screenPos.x = right - w;
-			screenPos.y = y;
+			pos.x = right - w;
+			pos.y = y;
 		}
 		if (y - h <= top) {
-			screenPos.x = x;
-			screenPos.y = top + h;
+			pos.x = x;
+			pos.y = top + h;
 		} else if (y + h >= bottom) {
-			screenPos.x = x;
-			screenPos.y = bottom - h;
+			pos.x = x;
+			pos.y = bottom - h;
 		}
-		this.calViewPortPos();
-		sprite.position.set(viewPortPos.x, viewPortPos.y);
-	}
-	/**
-	 * 计算视口位置
-	 */
-	calViewPortPos() {
-		let w = SCREEN.width / 2;
-		let h = SCREEN.height / 2;
-		let x = SCREEN.width / 2;
-		let y = SCREEN.height / 2;
-		const {viewPortPos, screenPos } = this;
-		const { left, right, top, bottom } = this.bound;
-		if (screenPos.x - w <= left) {
-			x = w + screenPos.x - (left + w);
-		} else if (screenPos.x + w >= right) {
-			x = w +  screenPos.x - (right - w);
-		}
-		if (screenPos.y - h <= top) {
-			y = h + screenPos.y - (top + h);
-		} else if (screenPos.y + h >= bottom) {
-			y = h + screenPos.y - (bottom - h);
-		}
-		viewPortPos.x = x;
-		viewPortPos.y = y;
+		sprite.position.set(pos.x, pos.y);
 	}
 }
 

@@ -1,15 +1,13 @@
 import {
-	Sprite,
-	Texture,
 	Point,
-	Matrix
+	Container
 } from 'pixi.js';
 import Food from './Food';
 import EventController from '../event/EventController';
 import Event from '../event/Event';
 import {
 	Sphere
-} from '../Bound';
+} from '../utils/Bound';
 import {
 	FOOD_NUM_MAX,
 	FOOD_NUM_MIN,
@@ -19,80 +17,49 @@ import {
 	VERTICAL__DIVISION_NUM,
 	DIVISION_WIDTH,
 	UPDATE_SCORE,
-	UPDATE_FOODS,
-	SCREEN_TO_MAP_MATRIX,
-	SCREEN
-} from '../constants';
+	FOOD_SPHERE_RADIUS
+} from '../utils/constants';
 
 class FoodsManager {
-	constructor(app) {
+	constructor() {
 		this.name = 'foodsmanager';
-		this.app = app;
 		this.foods = [];
 		this.idleOrder = 0; //表示食物列表空闲的最小值，防止每次遍历食物列表都从0开始，降低时间复杂度
 		this.bound = null; //裁剪区的边界
 		this.timer = -1; //计时器
 		this.delay = -1; //计时器间隔
-
-		let _offsetCanvas = document.createElement('canvas'); //用来画食物的离屏canvas
-		_offsetCanvas.width = _OFFSET_CANVAS_WIDTH;
-		_offsetCanvas.height = _OFFSET_CANVAS_HEIGHT;
-		this._offsetCtx = _offsetCanvas.getContext('2d');
-
-		let offsetCanvas = document.createElement('canvas'); // 用来裁剪_offsetCanvas的离屏canvas
-		offsetCanvas.width = app.screen.width;
-		offsetCanvas.height = app.screen.height;
-		this.offsetCtx = offsetCanvas.getContext('2d');
-		this.mapImage = new Image();
-		this.mapImage.src = '../assets/images.png';
+		this.spriteImg = new Image();
+		this.spriteImg.src = '../assets/images.png';
 		this.sprite = null;
-		this.boundingSphere = new Sphere(0, 0, 20);
+		this.boundingSphere = new Sphere(0, 0, FOOD_SPHERE_RADIUS);
 		this.mPoint = new Point();
-		this._mPoint = new Point();
 		this.division = {};
+		this.container = new Container();
 	}
-	init() {
+	/**
+	 * @param {SnakeManager} sm 蛇管理器
+	 */
+	init(sm) {
+		this.sm = sm;
 		const {
-			_offsetCtx,
-			offsetCtx,
-			mPoint,
-			_mPoint,
 			division,
-			mapImage
+			container
 		} = this;
-		this.bound = {
-			left: SCREEN.width / 2 - _OFFSET_CANVAS_WIDTH / 2,
-			right: SCREEN.width / 2 + _OFFSET_CANVAS_WIDTH / 2,
-			top: SCREEN.height / 2 - _OFFSET_CANVAS_HEIGHT / 2,
-			bottom: SCREEN.height / 2 + _OFFSET_CANVAS_HEIGHT / 2
-		};
-		//将食物绘图区划分为30*15份100*100的区域
+		// 设置container的宽高
+		container.position.set(0, 0);
+		container.name = 'FoodManager';
+		// 将食物绘图区划分为30*15份100*100的区域
 		for (let i = 0; i < HORIZONTAL_DIVISION_NUM; i++) {
 			for (let j = 0; j < VERTICAL__DIVISION_NUM; j++) {
 				const key = `_${i}_${j}`;
 				division[key] = {};
 			}
 		}
+		// 创建食物
 		for (let i = 0; i < FOOD_NUM_MIN; i++) {
 			const food = this.createFood();
-			_offsetCtx.drawImage(mapImage, food.imgX, food.imgY, food.w, food.h, food.x, food.y, food.w, food.h);
+			container.addChild(food.sprite);
 		}
-		const point = new Point(400, 200);
-		SCREEN_TO_MAP_MATRIX.apply(point, mPoint); //渲染坐标 => 地图坐标
-		SCREEN_TO_MAP_MATRIX.apply(point, _mPoint); //渲染坐标 => 地图坐标
-		offsetCtx.drawImage(_offsetCtx.canvas, mPoint.x - SCREEN.width / 2, mPoint.y - SCREEN.height / 2, SCREEN.width, SCREEN.height, 0, 0, SCREEN.width, SCREEN.height);
-		const texture = new Texture.fromCanvas(offsetCtx.canvas);
-		this.sprite = new Sprite(texture);
-		const self = this;
-		const eventAdapter = {
-			eventHandler(ev) {
-				if (ev.type !== UPDATE_FOODS) {
-					return;
-				}
-				self.update(ev.point);
-			}
-		}
-		EventController.subscribe(eventAdapter);
 		this.generateFood();
 	}
 	/**
@@ -101,7 +68,6 @@ class FoodsManager {
 	createFood() {
 		const {
 			foods,
-			app,
 			division
 		} = this;
 		if (foods[this.idleOrder] && this.idleOrder < foods.length) {
@@ -114,7 +80,7 @@ class FoodsManager {
 		const y = iy * DIVISION_WIDTH + 16 + 1 + Math.random() * (DIVISION_WIDTH - 2 * 16 - 2);
 		const divisionKey = `_${ix}_${iy}`;
 		const type = Math.ceil(Math.random() * 6);
-		const food = new Food(x, y, type, this.idleOrder, divisionKey, app.ticker);
+		const food = new Food(x, y, type, this.idleOrder, divisionKey);
 		this.foods[this.idleOrder] = food;
 		division[divisionKey][this.idleOrder] = 1;
 		return food;
@@ -161,52 +127,6 @@ class FoodsManager {
 		return (100000 - 4000) / (FOOD_NUM_MAX - FOOD_NUM_MIN) * foodsCount;
 	}
 	/**
-	 * 画出食物
-	 * @param {Point} p 蛇头相对于相对于食物绘图区的位置 {x, y}
-	 */
-	drawFoods(p) {
-		const {
-			_offsetCtx,
-			foods,
-			mapImage,
-			boundingSphere,
-			division
-		} = this;
-		boundingSphere.x = p.x;
-		boundingSphere.y = p.y;
-		//遍历蛇头所处位置的区域
-		const ix = Math.floor(p.x / DIVISION_WIDTH);
-		const iy = Math.floor(p.y / DIVISION_WIDTH);
-		const key = `_${ix}_${iy}`;
-		const foodOrders = Object.keys(division[key]);
-		if (foodOrders.length === 0) {
-			return;
-		}
-		// _offsetCtx.clearRect(0, 0, 3000, 1500);
-		_offsetCtx.clearRect(ix * DIVISION_WIDTH, iy * DIVISION_WIDTH, DIVISION_WIDTH, DIVISION_WIDTH);
-		for (let i = 0; i < foodOrders.length; i++) {
-			const order = foodOrders[i]
-			const food = foods[order];
-			//如果对应下标的食物不存在
-			if (!food) {
-				continue;
-			}
-			//如果食物并未已经处在被吃状态，并且处在蛇的觅食范围内，执行吃食物方法
-			if (!food.eaten && boundingSphere.surroundPoint({
-				x: food.x,
-				y: food.y
-			})) {
-				this.eatFood(food, p);
-			}
-			//如果食物被吃完，那么移除食物
-			if (!food.visible) {
-				this.removeFood(food);
-				continue;
-			}
-			_offsetCtx.drawImage(mapImage, food.imgX, food.imgY, food.w, food.h, food.x, food.y, food.w, food.h);
-		}
-	}
-	/**
 	 * 吃掉食物
 	 * @param {Food} food 食物
 	 * @param {Point} p 蛇头相对于_offsetCanvas的位置 {x, y}
@@ -219,44 +139,42 @@ class FoodsManager {
 	 * 更新食物
 	 * @param {Object} p 当前蛇头的位置{x, y}
 	 */
-	update(p) {
-		let {
-			x,
-			y
-		} = p;
-		const {
-			_offsetCtx,
-			offsetCtx,
-			sprite,
-			mPoint,
-			_mPoint
-		} = this;
-		const {
-			left,
-			right,
-			top,
-			bottom
-		} = this.bound;
-		// 判断是否已经超出地图边界
-		if (x + SCREEN.width / 2 >= right) {
-			x = right - SCREEN.width / 2;
-		}
-		if (x - SCREEN.width / 2 <= left) {
-			x = left + SCREEN.width / 2;
-		}
-		if (y + SCREEN.height / 2 >= bottom) {
-			y = bottom - SCREEN.height / 2;
-		}
-		if (y - SCREEN.height / 2 <= top) {
-			y = top + SCREEN.height / 2;
-		}
-		const point = new Point(x, y);
-		SCREEN_TO_MAP_MATRIX.apply(point, mPoint);
-		SCREEN_TO_MAP_MATRIX.apply(p, _mPoint);
-		this.drawFoods(_mPoint);
-		offsetCtx.clearRect(0, 0, SCREEN.width, SCREEN.height);
-		offsetCtx.drawImage(_offsetCtx.canvas, mPoint.x - SCREEN.width / 2, mPoint.y - SCREEN.height / 2, SCREEN.width, SCREEN.height, 0, 0, SCREEN.width, SCREEN.height);
-		sprite.texture.update();
+	update() {
+		// const {
+		// 	foods,
+		// 	boundingSphere,
+		// 	division
+		// } = this;
+		// boundingSphere.x = p.x;
+		// boundingSphere.y = p.y;
+		// //遍历蛇头所处位置的区域
+		// const ix = Math.floor(p.x / DIVISION_WIDTH);
+		// const iy = Math.floor(p.y / DIVISION_WIDTH);
+		// const key = `_${ix}_${iy}`;
+		// const foodOrders = Object.keys(division[key]);
+		// if (foodOrders.length === 0) {
+		// 	return;
+		// }
+		// for (let i = 0; i < foodOrders.length; i++) {
+		// 	const order = foodOrders[i]
+		// 	const food = foods[order];
+		// 	//如果对应下标的食物不存在
+		// 	if (!food) {
+		// 		continue;
+		// 	}
+		// 	//如果食物并未已经处在被吃状态，并且处在蛇的觅食范围内，执行吃食物方法
+		// 	if (!food.eaten && boundingSphere.surroundPoint({
+		// 		x: food.x,
+		// 		y: food.y
+		// 	})) {
+		// 		this.eatFood(food, p);
+		// 	}
+		// 	//如果食物被吃完，那么移除食物
+		// 	if (!food.visible) {
+		// 		this.removeFood(food);
+		// 		continue;
+		// 	}
+		// }
 	}
 }
 export default FoodsManager;

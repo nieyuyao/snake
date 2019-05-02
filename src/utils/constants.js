@@ -12,10 +12,10 @@ export const MAX_PLAYERS_NUM = 30; //最多的玩家数目
 export const SCREEN_TO_MAP_MATRIX = new Matrix(1, 0, 0, 1, 0, 0); // 矩阵 屏幕坐标(屏幕左上角)=>地图坐标(左上角)
 export const SCREEN_TO_VIEWPORT_MATRIX = new Matrix(1, 0, 0, 1, 0, 0); //矩阵 屏幕坐标(屏幕左上角)=>视口坐标(相对于玩家的蛇，坐标系原点也为屏幕左上角)
 export const UPDATE_SCORE = 'update-socre';
-export const UPDATE_MAP = 'update-map';
-export const UPDATE_FOODS = 'update-foods';
+export const UPDATE_MY_SNAKE = 'update-mysnake';
+// export const UPDATE_FOODS = 'update-foods';
 export const COLLISION = 'collision';
-
+export const FOOD_SPHERE_RADIUS = 20;
 export const SCREEN = {
 	width: 0,
 	height: 0

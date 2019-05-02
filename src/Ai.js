@@ -5,11 +5,9 @@ class Ai {
 	 * @param {App} app
 	 * @param {SnakeManager} sm
 	 */
-	constructor(app, sm) {
+	constructor(sm) {
 		this.snakes = [];
-		this.app = app;
 		this.sm = sm;
-		app.ticker.add(this.update, this);
 	}
 	addSnake(snake) {
 		this.snakes.push(snake);

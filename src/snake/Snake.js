@@ -1,10 +1,10 @@
-import { Container, Point } from 'pixi.js';
+import { Container } from 'pixi.js';
 import SnakeBody from './SnakeBody';
 import SnakeHead from './SnakeHead';
 import EventController from '../event/EventController';
 import Event from '../event/Event';
-import Collision from '../Collision';
-import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, COLLISION, UPDATE_SCORE, SCREEN } from '../constants';
+import Collision from '../utils/Collision';
+import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, COLLISION, SCREEN } from '../utils/constants';
 
 /**
  * 玩家自己的蛇
@@ -25,64 +25,51 @@ class Snake {
 		this.VEC_MAX = 4;
 		this.VEC_MIN = 2;
 		this.a = 0.1;
-		this._score = 0;
-	}
-	get score() {
-		return this._score;
-	}
-	set score(val) {
-		if (val % 5 === 0) {
-			this.addBody();
-		}
-		this._score = val;
 	}
 	/**
 	 * 初始化
 	 * @param {Number} id
-	 * @param {Point} screenPos 地图坐标
+	 * @param {Point} startPos 开始位置
 	 */
-	init(id, screenPos) {
+	init(id, startPos) {
 		this.id = id;
 		const { bodies, cate, bodyContainer, container } = this;
 		// 边界
 		const bound = {
-			left: SCREEN.width / 2 - _OFFSET_CANVAS_WIDTH / 2,
-			right: SCREEN.width / 2 + _OFFSET_CANVAS_WIDTH / 2,
-			top: SCREEN.height / 2 - _OFFSET_CANVAS_HEIGHT / 2,
-			bottom: SCREEN.height / 2 + _OFFSET_CANVAS_HEIGHT / 2
+			left: 0,
+			right: _OFFSET_CANVAS_WIDTH,
+			top: 0,
+			bottom: _OFFSET_CANVAS_HEIGHT
 		};
 		this.bound = bound;
 		// 蛇头
-		this.head = new SnakeHead(null, cate, 'head', screenPos, bound, SCREEN.width, SCREEN.height);
-		// const head = this.head;
-		// head.sprite.position.set(SCREEN.width / 2, SCREEN.height / 2);
+		this.head = new SnakeHead(null, cate, 'head', startPos, bound, SCREEN.width, SCREEN.height);
 		// 蛇身
 		const body1 = new SnakeBody(this.head, cate, 'body', bound);
 		const body2 = new SnakeBody(body1, cate, 'body', bound);
 		const body3 = new SnakeBody(body2, cate, 'body', bound);
 		const body4 = new SnakeBody(body3, cate, 'body', bound);
-		
 		bodies.push(body1);
 		bodies.push(body2);
 		bodies.push(body3);
 		bodies.push(body4);
-
 		for (let i = 0; i < INITIAL_SNAKE_BODY_NUM; i++) {
 			const body = bodies[i];
 			bodyContainer.addChild(body.sprite);
 		}
+		container.addChild(bodyContainer);
+		container.addChild(this.head.sprite);
+		container.name = 'snake';
 		const self = this;
 		// 订阅更新分数事件，如果吃到食物进行加分，并判断是否需要增加蛇的长度
 		const eventAdapter = {
 			eventHandler(ev) {
-				if (ev.type === UPDATE_SCORE) {
-					self.score += 1;
-				}
+				// if (ev.type === UPDATE_SCORE) {
+				// 	self.score += 1;
+				// }
 			}
 		}
 		EventController.subscribe(eventAdapter);
-		container.addChild(bodyContainer);
-		container.addChild(this.head.sprite);
 	}
 	// 转向
 	turnAround(direc) {
@@ -147,8 +134,7 @@ class Snake {
 		return false;
 	}
 	// 是否快要碰撞
-	isWillCollide() {
-		
+	isWillCollide() {	
 	}
 	// 发出事件
 	emit() {

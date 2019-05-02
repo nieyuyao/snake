@@ -14,30 +14,27 @@ class Game {
 		this.app = app;
 	}
 	init() {
-		this.foodsManager = new FoodsManager(this.app);
-		this.map = new GameMap(this.app);
+		this.foodsManager = new FoodsManager();
 		this.mySnake = new Snake();
-		this.controller = new Controller(this.app, this.map, this.mySnake);
-		this.snakeManager = new SnakeManager(this.app);
-		this.ai = new Ai(this.app, this.snakeManager);
+		this.snakeManager = new SnakeManager();
+		this.gameMap = new GameMap(this.app);
+		this.controller = new Controller(this.app, this.gameMap, this.mySnake);
+		this.foodsManager.init(this.snakeManager);
+		this.snakeManager.init();
+		this.snakeManager.setMySnake(this.mySnake);
 		// 初始化地图
-		this.map.init();
+		this.gameMap.init(this.foodsManager, this.snakeManager, this.mySnake);
 		// 初始化控制器
 		this.controller.init();
-		this.snakeManager.init();
-		this.foodsManager.init();
 		const {
-			map,
+			gameMap,
 			controller,
-			app,
-			foodsManager
+			app
 		} = this;
-		app.stage.addChild(map.sprite);
-		app.stage.addChild(foodsManager.sprite);
+		app.stage.addChild(gameMap.container);
 		app.stage.addChild(controller.container);
-		this.snakeManager.setMySnake(this.mySnake);
-		this.ai.addSnake(new Snake2());
 		this.initEventListeners();
+		this.start();
 	}
 	/**
 	 * 初始化事件
@@ -70,6 +67,9 @@ class Game {
 	/**
 	 * 启动游戏
 	 */
-	start() {}
+	start() {
+		const { app, gameMap } = this;
+		app.ticker.add(gameMap.update, gameMap);
+	}
 }
 export default Game;
