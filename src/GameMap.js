@@ -4,7 +4,6 @@ import {
 	Point,
 	Texture
 } from 'pixi.js';
-import EventController from './event/EventController';
 import {
 	_OFFSET_CANVAS_WIDTH,
 	_OFFSET_CANVAS_HEIGHT,
@@ -67,7 +66,7 @@ class GameMap {
 	 */
 	calcMapCoorFromSnake() {
 		const { mPoint, bound, mySnake } = this;
-		let { x, y } = mySnake.head.pos;
+		let { x, y } = mySnake.getPos();
 		const { left, right, top, bottom } = bound;
 		// 判断地图是否已经超出边界
 		// 计算x

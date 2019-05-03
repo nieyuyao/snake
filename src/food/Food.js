@@ -1,5 +1,7 @@
 import { Sprite, Texture } from 'pixi.js';
 import Interpolation from '../utils/Interpolation';
+import { Sphere } from '../utils/Bound';
+import { FOOD_CHECK_SPHERE_RADIUS } from '../utils/constants';
 
 class Food {
 	/**
@@ -20,6 +22,7 @@ class Food {
 		this.sprite.anchor.set(0.5, 0.5);
 		this.sprite.name = 'food';
 		this.sprite.position.set(x, y);
+		this.boundingSphere = new Sphere(x, y, FOOD_CHECK_SPHERE_RADIUS);
 	}
 	/**
 	 * 移动食物
@@ -45,7 +48,7 @@ class Food {
 		}
 		this.x = val.x;
 		this.y = val.y;
-		this.sprite.position.set(x, y);
+		this.sprite.position.set(this.x, this.y);
 	}
 	/**
 	 * 销毁食物

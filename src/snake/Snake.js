@@ -25,6 +25,7 @@ class Snake {
 		this.VEC_MAX = 4;
 		this.VEC_MIN = 2;
 		this.a = 0.1;
+		this.score = 0;
 	}
 	/**
 	 * 初始化
@@ -139,6 +140,10 @@ class Snake {
 	// 发出事件
 	emit() {
 		EventController.publish(new Event(COLLISION));
+	}
+	// 取到蛇头的位置
+	getPos() {
+		return this.head.pos;
 	}
 }
 

@@ -15,7 +15,7 @@ export const UPDATE_SCORE = 'update-socre';
 export const UPDATE_MY_SNAKE = 'update-mysnake';
 // export const UPDATE_FOODS = 'update-foods';
 export const COLLISION = 'collision';
-export const FOOD_SPHERE_RADIUS = 20;
+export const FOOD_CHECK_SPHERE_RADIUS = 20; //检测食物是否进入蛇的觅食范围的半径
 export const SCREEN = {
 	width: 0,
 	height: 0

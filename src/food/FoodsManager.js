@@ -6,9 +6,6 @@ import Food from './Food';
 import EventController from '../event/EventController';
 import Event from '../event/Event';
 import {
-	Sphere
-} from '../utils/Bound';
-import {
 	FOOD_NUM_MAX,
 	FOOD_NUM_MIN,
 	_OFFSET_CANVAS_WIDTH,
@@ -16,8 +13,6 @@ import {
 	HORIZONTAL_DIVISION_NUM,
 	VERTICAL__DIVISION_NUM,
 	DIVISION_WIDTH,
-	UPDATE_SCORE,
-	FOOD_SPHERE_RADIUS
 } from '../utils/constants';
 
 class FoodsManager {
@@ -31,7 +26,6 @@ class FoodsManager {
 		this.spriteImg = new Image();
 		this.spriteImg.src = '../assets/images.png';
 		this.sprite = null;
-		this.boundingSphere = new Sphere(0, 0, FOOD_SPHERE_RADIUS);
 		this.mPoint = new Point();
 		this.division = {};
 		this.container = new Container();
@@ -129,52 +123,62 @@ class FoodsManager {
 	/**
 	 * 吃掉食物
 	 * @param {Food} food 食物
-	 * @param {Point} p 蛇头相对于_offsetCanvas的位置 {x, y}
+	 * @param {Point} p 食物需要移动到的位置
 	 */
 	eatFood(food, p) {
 		food.moveToSnake(p);
-		EventController.publish(new Event(UPDATE_SCORE));
 	}
 	/**
 	 * 更新食物
 	 * @param {Object} p 当前蛇头的位置{x, y}
 	 */
 	update() {
-		// const {
-		// 	foods,
-		// 	boundingSphere,
-		// 	division
-		// } = this;
-		// boundingSphere.x = p.x;
-		// boundingSphere.y = p.y;
-		// //遍历蛇头所处位置的区域
-		// const ix = Math.floor(p.x / DIVISION_WIDTH);
-		// const iy = Math.floor(p.y / DIVISION_WIDTH);
-		// const key = `_${ix}_${iy}`;
-		// const foodOrders = Object.keys(division[key]);
-		// if (foodOrders.length === 0) {
-		// 	return;
-		// }
-		// for (let i = 0; i < foodOrders.length; i++) {
-		// 	const order = foodOrders[i]
-		// 	const food = foods[order];
-		// 	//如果对应下标的食物不存在
-		// 	if (!food) {
-		// 		continue;
-		// 	}
-		// 	//如果食物并未已经处在被吃状态，并且处在蛇的觅食范围内，执行吃食物方法
-		// 	if (!food.eaten && boundingSphere.surroundPoint({
-		// 		x: food.x,
-		// 		y: food.y
-		// 	})) {
-		// 		this.eatFood(food, p);
-		// 	}
-		// 	//如果食物被吃完，那么移除食物
-		// 	if (!food.visible) {
-		// 		this.removeFood(food);
-		// 		continue;
-		// 	}
-		// }
+		this.checkFoodIsEaten();
+		const { foods } = this;
+		for (let i = 0, l = foods.length; i < l; i++) {
+			if (foods[i]) {
+				foods[i].update();
+			}
+		}
+	}
+	checkFoodIsEaten() {
+		const { foods, division, sm } = this;
+		const { snakes } = sm;
+		for (let si = 0; si < snakes.length; si++) {
+			const snake = snakes[si];
+			const pos = snake.getPos();
+			const ix = Math.floor(pos.x / DIVISION_WIDTH);
+			const iy = Math.floor(pos.y / DIVISION_WIDTH);
+			const key = `_${ix}_${iy}`; // 当前蛇所在的区域
+			const foodOrders = Object.keys(division[key]);
+			if (!foodOrders.length) {
+				continue;
+			}
+			for (let foi = 0; foi < foodOrders.length; foi++) {
+				const order = foodOrders[foi];
+				const food = foods[order];
+				//如果对应下标的食物不存在
+				if (!food) {
+					continue;
+				}
+				//如果食物并未已经处在被吃状态，并且处在蛇的觅食范围内，执行吃食物方法
+				if (!food.eaten && food.boundingSphere.surroundPoint({
+					x: pos.x,
+					y: pos.y
+				})) {
+					this.eatFood(food, {
+						x: pos.x,
+						y: pos.y
+					});
+					snake.score++;
+				}
+				//如果食物被吃完，那么移除食物
+				if (!food.visible) {
+					this.removeFood(food);
+					continue;
+				}
+			}
+		}
 	}
 }
 export default FoodsManager;
