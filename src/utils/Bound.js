@@ -8,9 +8,9 @@ export const dotProduct = function (v1, v2) {
 		v1.z = 0;
 	}
 	if (!v2.z) {
-		v1.z = 0;
+		v2.z = 0;
 	}
-	return v1.x * v2.x + v1.y + v2.y + v1.z * v2.z;
+	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 };
 /**
  * 向量叉乘
@@ -39,12 +39,24 @@ export const isEqualVector = function (v1, v2) {
 export const mode = function (v) {
 	return Math.sqrt(v.x * v.x + v.y * v.y);
 }
+export const squareDistance = function (p1, p2) {
+	return (p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y);
+}
+export const reflectVector = function (v1, v2) {
+	const cos = dotProduct(v1, v2);
+	const l = 1;
+	// const l = Math.sqrt((2 * cos * v1.x - v2.x) * (2 * cos * v1.x - v2.x) + ( 2 * cos * v1.y - v2.y) * ( 2 * cos * v1.y - v2.y));
+	return {
+		x: (2 * cos * v1.x - v2.x) / l,
+		y: (2 * cos * v1.y - v2.y) / l
+	};
+}
 /**
  * 包围圆
  * @param {Number} x 
  * @param {Number} y 
- * @param {Number} r 
- */
+ * @param {Number} r  
+ */   
 export const Sphere = function (x = 0, y = 0, r = 0) {
 	this.x = x;
 	this.y = y;

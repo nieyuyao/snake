@@ -3,10 +3,11 @@ import SnakeBody from './SnakeBody';
 import { crossProduct, Sphere } from '../utils/Bound';
 
 class SnakeHead extends SnakeBody {
-	constructor(precursor, cate = 1, type, startPos, bound = {left: 0, right: 0, top: 0, bottom: 0}) {
+	constructor(precursor, cate = 1, type, startPos, bound = {left: 0, right: 0, top: 0, bottom: 0}, parent) {
 		super(precursor, cate, type, bound);
 		this.name = 'SnakeHead';
 		this.pos = startPos;
+		this.parent = parent;
 		this.init();
 	}
 	init() {

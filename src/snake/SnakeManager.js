@@ -77,5 +77,8 @@ class SnakeManager {
 		this.mySnake = snake;
 		this.addSnake(snake);
 	}
+	createSnake() {
+		
+	}
 }
 export default SnakeManager;

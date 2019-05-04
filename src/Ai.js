@@ -1,3 +1,4 @@
+import AiSnake from './snake/AiSnake';
 
 class Ai {
 	/**
@@ -14,11 +15,9 @@ class Ai {
 		// 加入sm中，会给蛇随机分配一个位置
 		this.sm.addSnake(snake);
 	}
-	update() {
-		const { snakes } = this;
-		for (let i = 0, l = snakes.length; i < l; i++) {
-			const snake = snakes[i];
-		}
+	createAiSnake() {
+		const aiSnake = new AiSnake(this.sm);
+		this.addSnake(aiSnake);
 	}
 }
 

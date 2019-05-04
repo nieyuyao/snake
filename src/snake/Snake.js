@@ -4,7 +4,7 @@ import SnakeHead from './SnakeHead';
 import EventController from '../event/EventController';
 import Event from '../event/Event';
 import Collision from '../utils/Collision';
-import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, COLLISION, SCREEN } from '../utils/constants';
+import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SCREEN } from '../utils/constants';
 
 /**
  * 玩家自己的蛇
@@ -44,7 +44,7 @@ class Snake {
 		};
 		this.bound = bound;
 		// 蛇头
-		this.head = new SnakeHead(null, cate, 'head', startPos, bound, SCREEN.width, SCREEN.height);
+		this.head = new SnakeHead(null, cate, 'head', startPos, bound, SCREEN.width, SCREEN.height, this);
 		// 蛇身
 		const body1 = new SnakeBody(this.head, cate, 'body', bound);
 		const body2 = new SnakeBody(body1, cate, 'body', bound);
@@ -133,13 +133,6 @@ class Snake {
 			}
 		}
 		return false;
-	}
-	// 是否快要碰撞
-	isWillCollide() {	
-	}
-	// 发出事件
-	emit() {
-		EventController.publish(new Event(COLLISION));
 	}
 	// 取到蛇头的位置
 	getPos() {

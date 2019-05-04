@@ -3,8 +3,6 @@ import {
 	Container
 } from 'pixi.js';
 import Food from './Food';
-import EventController from '../event/EventController';
-import Event from '../event/Event';
 import {
 	FOOD_NUM_MAX,
 	FOOD_NUM_MIN,

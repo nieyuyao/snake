@@ -1,5 +1,3 @@
-import { Matrix } from 'pixi.js';
-
 export const FOOD_NUM_MAX = 1000;	//食物的最大数量
 export const FOOD_NUM_MIN = 100;	//食物的最小数量
 export const _OFFSET_CANVAS_WIDTH = 3000; //食物绘图离屏canvas的宽
@@ -9,13 +7,12 @@ export const VERTICAL__DIVISION_NUM = 15;	//食物绘图区y方向划分个数
 export const DIVISION_WIDTH = 100;	//划分区域宽高
 export const INITIAL_SNAKE_BODY_NUM = 4; //蛇刚开始时的body数量
 export const MAX_PLAYERS_NUM = 30; //最多的玩家数目
-export const SCREEN_TO_MAP_MATRIX = new Matrix(1, 0, 0, 1, 0, 0); // 矩阵 屏幕坐标(屏幕左上角)=>地图坐标(左上角)
-export const SCREEN_TO_VIEWPORT_MATRIX = new Matrix(1, 0, 0, 1, 0, 0); //矩阵 屏幕坐标(屏幕左上角)=>视口坐标(相对于玩家的蛇，坐标系原点也为屏幕左上角)
 export const UPDATE_SCORE = 'update-socre';
 export const UPDATE_MY_SNAKE = 'update-mysnake';
 // export const UPDATE_FOODS = 'update-foods';
 export const COLLISION = 'collision';
 export const FOOD_CHECK_SPHERE_RADIUS = 20; //检测食物是否进入蛇的觅食范围的半径
+export const SNAKE_COLLISON_RADIUS = 1600; //蛇的碰撞平方半径
 export const SCREEN = {
 	width: 0,
 	height: 0

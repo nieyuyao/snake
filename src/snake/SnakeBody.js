@@ -19,6 +19,7 @@ class SnakeBody {
 		this.bound = bound; //边界
 		this.direc = {x: 1, y: 0};
 		this.direcInterp = new Interpolation({x: 1, y: 0}, 6);
+		this.pos = {x: 0, y: 0};
 		this.init();
 	}
 	init() {
@@ -29,6 +30,8 @@ class SnakeBody {
 		const { precursor, sprite } = this;
 		const x = precursor.sprite.position.x - sprite.width * precursor.direc.x;
 		const y = precursor.sprite.position.y - sprite.width * precursor.direc.y;
+		this.pos.x = x;
+		this.pos.y = y;
 		this.direc.x = precursor.direc.x;
 		this.direc.y = precursor.direc.y;
 		this.sprite.position.set(x, y);
@@ -62,12 +65,14 @@ class SnakeBody {
 	 * 位置进行插值更新
 	 */
 	updateBodyPos() {
-		const { direc, sprite, precursor } = this;
+		const { direc, sprite, precursor, pos } = this;
 		const { position: precursorPos, width: width } = precursor.sprite;
 		const { x: dx = 0, y: dy = 0 } = direc;
 		const x = precursorPos.x - width * dx;
 		const y = precursorPos.y - width * dy;
 		sprite.position.set(x, y);
+		pos.x = x;
+		pos.y = y;
 	}
 }
 

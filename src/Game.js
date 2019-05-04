@@ -3,7 +3,7 @@ import Controller from './Controller';
 import Event from './event/Event';
 import EventController from './event/EventController';
 import Snake from './snake/Snake';
-import Snake2 from './snake/Snake2';
+import AiSnake from './snake/AiSnake';
 import FoodsManager from './food/FoodsManager';
 import SnakeManager from './snake/SnakeManager';
 import Ai from './Ai';
@@ -19,6 +19,8 @@ class Game {
 		this.snakeManager = new SnakeManager();
 		this.gameMap = new GameMap(this.app);
 		this.controller = new Controller(this.app, this.gameMap, this.mySnake);
+		this.ai = new Ai(this.snakeManager);
+		// this.aiSnake = new AiSnake();
 		this.foodsManager.init(this.snakeManager);
 		this.snakeManager.init();
 		this.snakeManager.setMySnake(this.mySnake);
@@ -29,8 +31,18 @@ class Game {
 		const {
 			gameMap,
 			controller,
-			app
+			app,
+			aiSnake,
+			ai
 		} = this;
+		// ai.addSnake(aiSnake);
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		window.ai = ai;
 		app.stage.addChild(gameMap.container);
 		app.stage.addChild(controller.container);
 		this.initEventListeners();
