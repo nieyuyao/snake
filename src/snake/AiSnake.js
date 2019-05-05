@@ -2,14 +2,14 @@ import Snake from './Snake';
 import SnakeHead from './SnakeHead';
 import SnakeBody from './SnakeBody';
 import { crossProduct, squareDistance, reflectVector } from '../utils/Bound'
-import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SNAKE_COLLISON_RADIUS } from '../utils/constants';
+import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SNAKE_COLLISON_RADIUS, SNAKE_BOUND } from '../utils/constants';
 
 /**
  * 非玩家自己的蛇
  */
 class AiSnakeHead extends SnakeHead {
-	constructor(precursor, cate = 1, type, startPos, bound = {left: 0, right: 0, top: 0, bottom: 0}, parent, sm) {
-		super(precursor, cate, type, startPos, bound);
+	constructor(precursor, cate = 1, type, startPos, startDirec, parent, sm) {
+		super(precursor, cate, type, startPos, startDirec);
 		this.name = 'AiSnakeHead';
 		this.sm = sm;
 		this.parent = parent;
@@ -47,7 +47,7 @@ class AiSnakeHead extends SnakeHead {
 	 * @param {Object} v 速度 {x, y}
 	 */
 	updateHeadDirec() {
-		const { direcInterp, direc, sprite, bound, pos } = this;
+		const { direcInterp, direc, sprite, pos } = this;
 		const lerpDirec = direcInterp.lerp();
 		direc.x = lerpDirec.x;
 		direc.y = lerpDirec.y;
@@ -57,19 +57,19 @@ class AiSnakeHead extends SnakeHead {
 		const { x, y } = pos;
 		this.isWillCollision();
 		// 到达左边缘
-		if (x - w <= bound.left) {
+		if (x - w <= SNAKE_BOUND.left) {
 			this.turnRound({x: 0, y: 1});
 		}
 		// 到达右边缘
-		if (x + w >= bound.right) {
+		if (x + w >= SNAKE_BOUND.right) {
 			this.turnRound({x: 0, y: 1});
 		}
 		// 到达上边缘
-		if (y - h <= bound.top) {
+		if (y - h <= SNAKE_BOUND.top) {
 			this.turnRound({x: 1, y: 0});
 		}
 		// 到达下边缘
-		if (y + h >= bound.bottom) {
+		if (y + h >= SNAKE_BOUND.bottom) {
 			this.turnRound({x: 1, y: 0});
 		}
 		const cross = crossProduct({x: 1, y: 0}, direc);
@@ -93,24 +93,16 @@ class AiSnake extends Snake {
 		this.name = 'AiSnake';
 		this.sm = sm;
 	}
-	init(id, startPos) {
+	init(id, startPos, startDirec) {
 		this.id = id;
 		const { bodies, cate, bodyContainer, container, sm } = this;
-		// 边界
-		const bound = {
-			left: 0,
-			right: _OFFSET_CANVAS_WIDTH,
-			top: 0,
-			bottom: _OFFSET_CANVAS_HEIGHT
-		};
-		this.bound = bound;
 		// 蛇头
-		this.head = new AiSnakeHead(null, cate, 'head', startPos, bound, this, sm);
+		this.head = new AiSnakeHead(null, cate, 'head', startPos, startDirec, this, sm);
 		// 蛇身
-		const body1 = new SnakeBody(this.head, cate, 'body', bound);
-		const body2 = new SnakeBody(body1, cate, 'body', bound);
-		const body3 = new SnakeBody(body2, cate, 'body', bound);
-		const body4 = new SnakeBody(body3, cate, 'body', bound);
+		const body1 = new SnakeBody(this.head, cate, 'body');
+		const body2 = new SnakeBody(body1, cate, 'body');
+		const body3 = new SnakeBody(body2, cate, 'body');
+		const body4 = new SnakeBody(body3, cate, 'body');
 		bodies.push(body1);
 		bodies.push(body2);
 		bodies.push(body3);

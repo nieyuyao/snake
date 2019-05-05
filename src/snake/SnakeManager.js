@@ -1,7 +1,5 @@
 import { Point, Container } from 'pixi.js';
 import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, UPDATE_MY_SNAKE } from '../utils/constants';
-import EventController from '../event/EventController';
-import Event from '../event/Event';
 
 /**
  * 管理游戏中的蛇
@@ -35,7 +33,8 @@ class SnakeManager {
 	addSnake(snake) {
 		const { snakes, container } = this;
 		const pos = this.getRandomPos();
-		snake.init(snakes.length, pos);
+		const direc = this.randomDirec();
+		snake.init(snakes.length, pos, direc);
 		snakes.push(snake);
 		container.addChild(snake.container);
 	}
@@ -49,12 +48,6 @@ class SnakeManager {
 	 * 更新每条蛇的位置
 	 */
 	update() {
-		if (this.mySnake) {
-			this.mySnake.update();
-			const pos = this.mySnake.head.pos; // 屏幕坐标
-			EventController.publish(new Event(UPDATE_MY_SNAKE, pos.x, pos.y));
-			// EventController.publish(new Event(UPDATE_FOODS, pos.x, pos.y));
-		}
 		const { snakes } = this;
 		for (let i = 0, l = snakes.length; i < l; i++) {
 			snakes[i].update();
@@ -68,6 +61,16 @@ class SnakeManager {
 		let x = Math.random() * _OFFSET_CANVAS_WIDTH;
 		let y = Math.random() * _OFFSET_CANVAS_HEIGHT;
 		return new Point(x, y);
+	}
+	/**
+	 * 随机方向
+	 */
+	randomDirec() {
+		const s = Math.random();
+		const r = Math.random();
+		const x = s * (s > 0.5 ? 1 : -1);
+		const y = Math.sqrt(1 - x * x) * (r > 0.5 ? 1 : -1);
+		return { x, y};
 	}
 	/**
 	 * 设置玩家的蛇

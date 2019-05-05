@@ -1,20 +1,27 @@
 import { Sprite, Texture } from 'pixi.js';
 import SnakeBody from './SnakeBody';
 import { crossProduct, Sphere } from '../utils/Bound';
+import Interpolation from '../utils/Interpolation';
+import { SNAKE_BOUND } from '../utils/constants';
 
 class SnakeHead extends SnakeBody {
-	constructor(precursor, cate = 1, type, startPos, bound = {left: 0, right: 0, top: 0, bottom: 0}, parent) {
-		super(precursor, cate, type, bound);
+	constructor(precursor, cate = 1, type, startPos, startDirec, parent) {
+		super(precursor, cate, type);
 		this.name = 'SnakeHead';
 		this.pos = startPos;
+		this.direc = startDirec;
 		this.parent = parent;
+		this.direcInterp = null;
 		this.init();
 	}
 	init() {
+		// 随机方向
 		const frame = this.type + this.cate + '.png';
 		this.sprite = new Sprite(Texture.fromFrame(frame));
 		this.sprite.scale.set(0.4, 0.4);
 		this.sprite.anchor.set(0.5, 0.5);
+		// 插值计算
+		this.direcInterp = new Interpolation(this.direc, 6);
 		this.sprite.name = 'SnakeHead';
 		// 蛇身体的包围圆
 		this.boundingSphere = new Sphere(0, 0, this.sprite.width);
@@ -30,7 +37,7 @@ class SnakeHead extends SnakeBody {
 	 * 更新蛇头的插值方向
 	 */
 	updateHeadDirec() {
-		const { direcInterp, direc, sprite, bound, pos } = this;
+		const { direcInterp, direc, sprite, pos } = this;
 		const lerpDirec = direcInterp.lerp();
 		direc.x = lerpDirec.x;
 		direc.y = lerpDirec.y;
@@ -38,10 +45,10 @@ class SnakeHead extends SnakeBody {
 		const w = sprite.width / 2;
 		const h = w;
 		const { x, y } = pos;
-		if ((x - w <= bound.left && direc.x < 0) || (x + w >= bound.right && direc.x > 0)) {
+		if ((x - w <= SNAKE_BOUND.left && direc.x < 0) || (x + w >= SNAKE_BOUND.right && direc.x > 0)) {
 			//到达左边缘
 			direc.x = 0;
-		} else if ((y - h <= bound.top && direc.y < 0) || (y + h >= bound.bottom && direc.y > 0)) {
+		} else if ((y - h <= SNAKE_BOUND.top && direc.y < 0) || (y + h >= SNAKE_BOUND.bottom && direc.y > 0)) {
 			direc.y = 0;
 		}
 		const cross = crossProduct({x: 1, y: 0}, direc);
@@ -53,7 +60,7 @@ class SnakeHead extends SnakeBody {
 	 */
 	updateHeadPos(v) {
 		const { sprite, direc, pos } = this;
-		const { left, right, top, bottom } = this.bound;
+		const { left, right, top, bottom } = SNAKE_BOUND;
 		let x = pos.x + direc.x * v;
 		let y = pos.y + direc.y * v;
 		const w = sprite.width / 2;

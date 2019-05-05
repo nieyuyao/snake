@@ -18,7 +18,7 @@ class Snake {
 		this.name = 'Snake';
 		this.head = null;
 		this.bodies = [];
-		this.cate = 1; // 类别
+		this.cate = Math.floor((Math.random() * 5) + 1); // 类别
 		this.container = new Container();
 		this.bodyContainer = new Container();
 		this.v = 2; // 初始速度
@@ -31,25 +31,18 @@ class Snake {
 	 * 初始化
 	 * @param {Number} id
 	 * @param {Point} startPos 开始位置
+	 * @param {Point} startDirec 开始方向
 	 */
-	init(id, startPos) {
+	init(id, startPos, startDirec) {
 		this.id = id;
 		const { bodies, cate, bodyContainer, container } = this;
-		// 边界
-		const bound = {
-			left: 0,
-			right: _OFFSET_CANVAS_WIDTH,
-			top: 0,
-			bottom: _OFFSET_CANVAS_HEIGHT
-		};
-		this.bound = bound;
 		// 蛇头
-		this.head = new SnakeHead(null, cate, 'head', startPos, bound, SCREEN.width, SCREEN.height, this);
+		this.head = new SnakeHead(null, cate, 'head', startPos, startDirec, this);
 		// 蛇身
-		const body1 = new SnakeBody(this.head, cate, 'body', bound);
-		const body2 = new SnakeBody(body1, cate, 'body', bound);
-		const body3 = new SnakeBody(body2, cate, 'body', bound);
-		const body4 = new SnakeBody(body3, cate, 'body', bound);
+		const body1 = new SnakeBody(this.head, cate, 'body');
+		const body2 = new SnakeBody(body1, cate, 'body');
+		const body3 = new SnakeBody(body2, cate, 'body');
+		const body4 = new SnakeBody(body3, cate, 'body');
 		bodies.push(body1);
 		bodies.push(body2);
 		bodies.push(body3);
@@ -61,16 +54,6 @@ class Snake {
 		container.addChild(bodyContainer);
 		container.addChild(this.head.sprite);
 		container.name = 'snake';
-		const self = this;
-		// 订阅更新分数事件，如果吃到食物进行加分，并判断是否需要增加蛇的长度
-		const eventAdapter = {
-			eventHandler(ev) {
-				// if (ev.type === UPDATE_SCORE) {
-				// 	self.score += 1;
-				// }
-			}
-		}
-		EventController.subscribe(eventAdapter);
 	}
 	// 转向
 	turnAround(direc) {
@@ -78,9 +61,9 @@ class Snake {
 	}
 	// 吃掉食物之后，增加一个蛇的长度
 	addBody() {
-		const { cate, bodies, bound, bodyContainer } = this;
+		const { cate, bodies, bodyContainer } = this;
 		const precursor = bodies[bodies.length - 1];
-		const body = new SnakeBody(precursor, cate, 'body', bound);
+		const body = new SnakeBody(precursor, cate, 'body');
 		bodies.push(body);
 		bodyContainer.addChild(body.sprite);
 	}

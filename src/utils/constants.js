@@ -13,6 +13,12 @@ export const UPDATE_MY_SNAKE = 'update-mysnake';
 export const COLLISION = 'collision';
 export const FOOD_CHECK_SPHERE_RADIUS = 20; //检测食物是否进入蛇的觅食范围的半径
 export const SNAKE_COLLISON_RADIUS = 1600; //蛇的碰撞平方半径
+export const SNAKE_BOUND = {
+	left: 0,
+	right: _OFFSET_CANVAS_WIDTH,
+	top: 0,
+	bottom: _OFFSET_CANVAS_HEIGHT
+};
 export const SCREEN = {
 	width: 0,
 	height: 0
