@@ -7,14 +7,14 @@ import {
 import {
 	_OFFSET_CANVAS_WIDTH,
 	_OFFSET_CANVAS_HEIGHT,
-	SCREEN
+	SCREEN,
+	SNAKE_BOUND
 } from './utils/constants';
 
 class GameMap {
 	constructor() {
 		this.name = 'gamemap';
 		this.mPoint = new Point();
-		this.bound = null;
 		this.fm = null; // 食物管理器
 		this.sm = null; // 蛇管理器
 		this.mapSprite = new Sprite(); //地图
@@ -40,13 +40,6 @@ class GameMap {
 		container.addChild(fm.container);
 		container.addChild(sm.container);
 		container.name = 'GameMap';
-		// 边界范围
-		this.bound = {
-			left: 0,
-			right: _OFFSET_CANVAS_WIDTH,
-			top: 0,
-			bottom: _OFFSET_CANVAS_HEIGHT
-		};
 	}
 	/**
 	 * 更新地图
@@ -65,9 +58,9 @@ class GameMap {
 	 * @param {Point} sp 玩家自己的蛇的蛇头坐标
 	 */
 	calcMapCoorFromSnake() {
-		const { mPoint, bound, mySnake } = this;
+		const { mPoint, mySnake } = this;
 		let { x, y } = mySnake.getPos();
-		const { left, right, top, bottom } = bound;
+		const { left, right, top, bottom } = SNAKE_BOUND;
 		// 判断地图是否已经超出边界
 		// 计算x
 		if (x + SCREEN.width / 2 >= right) {

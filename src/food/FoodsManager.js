@@ -10,7 +10,7 @@ import {
 	_OFFSET_CANVAS_HEIGHT,
 	HORIZONTAL_DIVISION_NUM,
 	VERTICAL__DIVISION_NUM,
-	DIVISION_WIDTH,
+	DIVISION_WIDTH
 } from '../utils/constants';
 
 class FoodsManager {
@@ -18,7 +18,6 @@ class FoodsManager {
 		this.name = 'foodsmanager';
 		this.foods = [];
 		this.idleOrder = 0; //表示食物列表空闲的最小值，防止每次遍历食物列表都从0开始，降低时间复杂度
-		this.bound = null; //裁剪区的边界
 		this.timer = -1; //计时器
 		this.delay = -1; //计时器间隔
 		this.spriteImg = new Image();
