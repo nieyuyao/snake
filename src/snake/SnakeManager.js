@@ -39,6 +39,7 @@ class SnakeManager {
 		container.addChild(snake.container);
 	}
 	/**
+	 * TODO:
 	 * 删除蛇
 	 * @param {Snake} snake 
 	 */

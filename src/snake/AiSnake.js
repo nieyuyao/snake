@@ -2,7 +2,7 @@ import Snake from './Snake';
 import SnakeHead from './SnakeHead';
 import SnakeBody from './SnakeBody';
 import { crossProduct, squareDistance, reflectVector } from '../utils/Bound'
-import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SNAKE_COLLISON_RADIUS, SNAKE_BOUND } from '../utils/constants';
+import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SNAKE_COLLISON_RADIUS, SNAKE_BOUND, AI_SNAKE_WILL_COLLISION_TIME, SNAKE_DIE_RADIUS } from '../utils/constants';
 
 /**
  * 非玩家自己的蛇
@@ -13,23 +13,37 @@ class AiSnakeHead extends SnakeHead {
 		this.name = 'AiSnakeHead';
 		this.sm = sm;
 		this.parent = parent;
+		this.canCheckedIsWillCollide = true; // 是否可以进行即将碰撞检测
+		this.cTimer = -1; // 计时器句柄
 	}
 	// 检测是否即将与其他蛇碰撞
-	isWillCollision() {
+	checkCollide() {
 		const { snakes } = this.sm;
 		const thisSnake = this.parent;
 		const thisSnakePos = this.parent.getPos();
 		let will = false;
 		for (let si = 0, sl = snakes.length; si < sl; si++) {
 			const snake = snakes[si];
+			// 如果是自己不检测
 			if (snake === thisSnake) {
 				continue;
 			}
 			const bodies = snake.bodies;
 			for (let bi = 0, bl = bodies.length; bi < bl; bi++) {
 				const body = bodies[bi];
+				// 死亡
+				if (squareDistance(thisSnakePos, body.pos) <= SNAKE_DIE_RADIUS) {
+					//TODO:
+					console.log('die', thisSnake.id);
+				}
+				if (!this.canCheckedIsWillCollide) {
+					return;
+				}
+				// 转向
 				if (squareDistance(thisSnakePos, body.pos) <= SNAKE_COLLISON_RADIUS) {
 					this.turnRound(body.direc);
+					this.canCheckedIsWillCollide = false;
+					this.canCollideSchedule();
 					will = true;
 					break;
 				}
@@ -39,7 +53,7 @@ class AiSnakeHead extends SnakeHead {
 			}
 		}
 	}
-	// 检测哪个方向食物更多
+	// TODO:检测哪个方向食物更多
 	getMoreFoodsDirection() {
 	}
 	/**
@@ -55,7 +69,7 @@ class AiSnakeHead extends SnakeHead {
 		const w = sprite.width / 2;
 		const h = w;
 		const { x, y } = pos;
-		this.isWillCollision();
+		this.checkCollide();
 		// 到达左边缘
 		if (x - w <= SNAKE_BOUND.left) {
 			this.turnRound({x: 0, y: 1});
@@ -85,6 +99,12 @@ class AiSnakeHead extends SnakeHead {
 			x: direc.x,
 			y: direc.y
 		});
+	}
+	canCollideSchedule() {
+		this.cTimer = setTimeout(() => {
+			this.canCheckedIsWillCollide = true;
+			clearTimeout(this.cTimer);
+		}, AI_SNAKE_WILL_COLLISION_TIME);
 	}
 }
 class AiSnake extends Snake {

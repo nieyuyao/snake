@@ -44,14 +44,10 @@ export const squareDistance = function (p1, p2) {
 }
 export const reflectVector = function (v1, v2) {
 	const cos = dotProduct(v1, v2);
-	// const l = 1;
 	const l = Math.sqrt((2 * cos * v1.x - v2.x) * (2 * cos * v1.x - v2.x) + (2 * cos * v1.y - v2.y) * (2 * cos * v1.y - v2.y));
-	let x = (2 * cos * v1.x - v2.x) / l;
-	let y = (2 * cos * v1.y - v2.y) / l;
-	return {
-		x: x + (cos < 0.001 && cos > -0.001 ? 0.1 * v1.x : 0),
-		y: y + (cos < 0.001 && cos > -0.001 ? 0.1 * v1.y : 0)
-	}
+	const x = (2 * cos * v1.x - v2.x) / l;
+	const y = (2 * cos * v1.y - v2.y) / l;
+	return { x, y };
 }
 /**
  * 包围圆

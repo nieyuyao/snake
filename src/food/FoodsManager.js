@@ -168,6 +168,7 @@ class FoodsManager {
 						y: pos.y
 					});
 					snake.score++;
+					snake.addBody();
 				}
 				//如果食物被吃完，那么移除食物
 				if (!food.visible) {
