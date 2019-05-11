@@ -1,12 +1,13 @@
-import Game from './Game.js';
-import source from './source.js';
 import {
 	loaders,
 	Text,
 	TextStyle,
 	Application
 } from 'pixi.js';
-
+import Game from './Game';
+import source from './source';
+import { SCREEN, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT } from './utils/constants'
+ 
 const app = new Application({
 	height: 400
 });
@@ -23,6 +24,10 @@ const loadingText = new Text(
 		fill: 'white'
 	})
 );
+
+/* 初始化常量 */
+SCREEN.width = app.screen.width;
+SCREEN.height = app.screen.height;
 
 app.start();
 app.ticker.add(() => {
@@ -51,9 +56,10 @@ for (const key in source) {
 	const src = source[key];
 	loader.add(key, src);
 }
-
+// 加载资源
 loader.load(() => {
 	app.stage.removeChild(loadingText);
 	const game = new Game(app);
+	// 启动游戏
 	game.init();
 });

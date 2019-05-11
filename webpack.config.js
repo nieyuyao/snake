@@ -1,10 +1,12 @@
+/* eslint-disable global-require */
 const webpack = require('webpack');
 const path = require('path');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 const cleanWebpackPlugin = require('clean-webpack-plugin');
 const uglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const isProd = process.env.NODE_ENV === 'production';
 const fs = require('fs');
+
+const isProd = process.env.NODE_ENV === 'production';
 const config = {
 	entry: {
 		app: path.join(__dirname, '/src/index.js')

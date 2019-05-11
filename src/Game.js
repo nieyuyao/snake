@@ -1,8 +1,12 @@
-import GameMap from './GameMap.js';
-import Controller from './Controller.js';
-import Event from './Event.js';
-import EventController from './EventController.js';
-import Snake from './Snake.js';
+import GameMap from './GameMap';
+import Controller from './Controller';
+import Event from './event/Event';
+import EventController from './event/EventController';
+import Snake from './snake/Snake';
+import AiSnake from './snake/AiSnake';
+import FoodsManager from './food/FoodsManager';
+import SnakeManager from './snake/SnakeManager';
+import Ai from './Ai';
 
 class Game {
 	constructor(app) {
@@ -10,23 +14,61 @@ class Game {
 		this.app = app;
 	}
 	init() {
-		this.map = new GameMap(this.app);
-		this.snake = new Snake(this.app);
-		this.controller = new Controller(this.app, this.map, this.snake);
-		this.map.init();
+		this.foodsManager = new FoodsManager();
+		this.mySnake = new Snake();
+		this.snakeManager = new SnakeManager();
+		this.gameMap = new GameMap(this.app);
+		this.controller = new Controller(this.app, this.gameMap, this.mySnake);
+		this.ai = new Ai(this.snakeManager);
+		// this.aiSnake = new AiSnake();
+		this.foodsManager.init(this.snakeManager);
+		this.snakeManager.init();
+		this.snakeManager.setMySnake(this.mySnake);
+		// 初始化地图
+		this.gameMap.init(this.foodsManager, this.snakeManager, this.mySnake);
+		// 初始化控制器
 		this.controller.init();
-		this.snake.init();
 		const {
-			map,
+			gameMap,
 			controller,
-			snake,
-			app
+			app,
+			aiSnake,
+			ai
 		} = this;
-		app.stage.addChild(map.sprite);
+		// ai.addSnake(aiSnake);
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		ai.createAiSnake();
+		window.ai = ai;
+		app.stage.addChild(gameMap.container);
 		app.stage.addChild(controller.container);
-		app.stage.addChild(snake.container);
 		this.initEventListeners();
+		this.start();
 	}
+	/**
+	 * 初始化事件
+	 */
 	initEventListeners() {
 		const { app } = this;
 		app.view.addEventListener('pointerenter', (e) => {
@@ -48,7 +90,16 @@ class Game {
 			EventController.publish(new Event('pointerout', e.clientX, e.clientY));
 		});
 	}
+	/**
+	 * 重启游戏
+	 */
 	restart() {}
-	start() {}
+	/**
+	 * 启动游戏
+	 */
+	start() {
+		const { app, gameMap } = this;
+		app.ticker.add(gameMap.update, gameMap);
+	}
 }
 export default Game;

@@ -4,8 +4,8 @@ import {
 	Sprite,
 	Matrix
 } from 'pixi.js';
-import EventController from './EventController.js';
-import { Sphere } from './Bound.js';
+import EventController from './event/EventController';
+import { Sphere } from './utils/Bound';
 
 class Controller {
 	constructor(app, map, snake) {
