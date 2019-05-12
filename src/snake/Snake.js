@@ -4,28 +4,26 @@ import SnakeHead from './SnakeHead';
 import EventController from '../event/EventController';
 import Event from '../event/Event';
 import Collision from '../utils/Collision';
-import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SCREEN } from '../utils/constants';
+import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SNAKE_DIE_EVENT_NAME, SNAKE_VEC_MAX, SNAKE_VEC_MIN, SNAKE_A, SNAKE_VEC_0 } from '../utils/constants';
 
 /**
  * 玩家自己的蛇
  */
 class Snake {
 	/**
-	 * @param {Object} headInitialPos 蛇头的初始位置
-	 * @param {Number} id
+	 * @param {SnakeManager} sm 蛇管理器
 	 */
-	constructor() {
+	constructor(sm) {
 		this.name = 'Snake';
 		this.head = null;
 		this.bodies = [];
 		this.cate = Math.floor((Math.random() * 5) + 1); // 类别
 		this.container = new Container();
 		this.bodyContainer = new Container();
-		this.v = 2; // 初始速度
-		this.VEC_MAX = 4;
-		this.VEC_MIN = 2;
-		this.a = 0.1;
+		this.v = SNAKE_VEC_0; // 初始速度
 		this.score = 0;
+		this.died = false;
+		this.sm = sm;
 	}
 	/**
 	 * 初始化
@@ -37,7 +35,7 @@ class Snake {
 		this.id = id;
 		const { bodies, cate, bodyContainer, container } = this;
 		// 蛇头
-		this.head = new SnakeHead(null, cate, 'head', startPos, startDirec, this);
+		this.head = new SnakeHead(null, cate, 'head', startPos, startDirec, this, this.sm);
 		// 蛇身
 		const body1 = new SnakeBody(this.head, cate, 'body');
 		const body2 = new SnakeBody(body1, cate, 'body');
@@ -69,6 +67,11 @@ class Snake {
 	}
 	// 每帧更新
 	update() {
+		if (this.died) {
+			//TODO:死亡动画
+			this.disintegrate();
+			return;
+		}
 		this.head.updateHeadDirec();
 		this.head.updateHeadPos(this.v);
 		for (let i = 0; i < this.bodies.length; i++) {
@@ -91,12 +94,11 @@ class Snake {
 			return;
 		}
 		else {
-			const v = this.v;
-			this.v += accOrSlowDown * this.a;
-			if (this.v >= this.VEC_MAX) {
+			this.v += accOrSlowDown * SNAKE_A;
+			if (this.v >= SNAKE_VEC_MAX) {
 				cb.bind(context)(1);
 			}
-			if (this.v <= this.VEC_MIN) {
+			if (this.v <= SNAKE_VEC_MIN) {
 				cb.bind(context)(-1);
 			}
 		}
@@ -120,6 +122,24 @@ class Snake {
 	// 取到蛇头的位置
 	getPos() {
 		return this.head.pos;
+	}
+	getAllBodyPos() {
+		const bodiesPos = this.bodies.map(body => body.pos);
+		return [this.head.pos, ...bodiesPos];
+	}
+	// 解体
+	disintegrate() {
+		EventController.publish(new Event(SNAKE_DIE_EVENT_NAME, this.id));
+	}
+	// 死亡
+	die() {
+		this.died = true;
+	}
+	destory() {
+		this.head.destory();
+		for (let i = 0; i < this.bodies.length; i++) {
+			this.bodies[i].destory();
+		}
 	}
 }
 

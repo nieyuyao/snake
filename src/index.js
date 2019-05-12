@@ -9,7 +9,8 @@ import source from './source';
 import { SCREEN, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT } from './utils/constants'
  
 const app = new Application({
-	height: 400
+	width: window.screen.width,
+	height: window.screen.height
 });
 document.querySelector('#app').appendChild(app.view);
 

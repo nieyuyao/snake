@@ -1,5 +1,8 @@
 import { Point, Container } from 'pixi.js';
-import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, UPDATE_MY_SNAKE } from '../utils/constants';
+import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, SNAKE_DIE_EVENT_NAME, DIE_SNAKE_SCORE } from '../utils/constants';
+import EventController from '../event/EventController';
+import Event from '../event/Event';
+import Snake from './Snake';
 
 /**
  * 管理游戏中的蛇
@@ -11,7 +14,6 @@ class SnakeManager {
 		this.name = 'SnakeManager';
 		this.division = {};
 		this.snakes = [];
-		this.mySnake = null;
 		this.container = new Container();
 	}
 	init() {
@@ -25,6 +27,11 @@ class SnakeManager {
 		// 初始化容器
 		container.position.set(0, 0);
 		container.name = 'SnakeManager';
+		const self = this;
+		this.eventHandle = function (ev) {
+			self.removeSnake(ev.val);
+		}
+		EventController.subscribe(SNAKE_DIE_EVENT_NAME, this.eventHandle);
 	}
 	/**
 	 * 添加蛇
@@ -34,16 +41,29 @@ class SnakeManager {
 		const { snakes, container } = this;
 		const pos = this.getRandomPos();
 		const direc = this.randomDirec();
-		snake.init(snakes.length, pos, direc);
+		/* eslint-disable no-var, vars-on-top, block-scoped-var */
+		for (var i = 0, l = snakes.length; i < l; i++) {
+			if (!snakes[i]) {
+				break;
+			}
+		}
+		snake.init(i, pos, direc);
+		/* eslint-enable */
 		snakes.push(snake);
 		container.addChild(snake.container);
 	}
 	/**
-	 * TODO:
 	 * 删除蛇
-	 * @param {Snake} snake 
+	 * @param {Number} id 
 	 */
-	removeSnake(snake) {
+	removeSnake(id) {
+		const snake = this.snakes[id];
+		snake.destory();
+		EventController.publish(new Event(DIE_SNAKE_SCORE, {
+			score: snake.score,
+			positions: snake.getAllBodyPos()
+		}));
+		delete this.snakes[id];
 	}
 	/**
 	 * 更新每条蛇的位置
@@ -51,7 +71,9 @@ class SnakeManager {
 	update() {
 		const { snakes } = this;
 		for (let i = 0, l = snakes.length; i < l; i++) {
-			snakes[i].update();
+			if (snakes[i]) {
+				snakes[i].update();
+			}
 		}
 	}
 	/**
@@ -73,15 +95,12 @@ class SnakeManager {
 		const y = Math.sqrt(1 - x * x) * (r > 0.5 ? 1 : -1);
 		return { x, y};
 	}
-	/**
-	 * 设置玩家的蛇
-	 * @param {Snake} snake 玩家自己的蛇
-	 */
-	setMySnake(snake) {
-		this.mySnake = snake;
-		this.addSnake(snake);
-	}
 	createSnake() {
+		const snake = new Snake(this);
+		this.addSnake(snake);
+		return snake;
+	}
+	destroy() {
 		
 	}
 }

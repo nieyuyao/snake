@@ -6,15 +6,15 @@ import {
 } from 'pixi.js';
 import EventController from './event/EventController';
 import { Sphere } from './utils/Bound';
+import { SCREEN, CONTROLLER_BASE_WIDTH, CONTROLLER_BASE_HEIGHT } from './utils/constants';
 
 class Controller {
-	constructor(app, map, snake) {
+	constructor(app, map, mySnake) {
 		this.name = 'controller';
 		this.container = new Container();
 		this.app = app;
 		this.map = map; //地图
-		this.snake = snake;
-		EventController.subscribe(this);
+		this.mySnake = mySnake;
 	}
 	init() {
 		this.controlBack = new Sprite(Texture.fromFrame('control-back.png'));
@@ -31,32 +31,32 @@ class Controller {
 		} = this;
 
 		controlBack.anchor.set(0.5, 0.5);
-		controlBack.position.set(150, 260);
+		controlBack.position.set(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		container.addChild(controlBack);
 
 		controlRocker.anchor.set(0.5, 0.5);
-		controlRocker.position.set(150, 260);
+		controlRocker.position.set(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		container.addChild(controlRocker);
 
 		controlFlash.anchor.set(0.5, 0.5);
-		controlFlash.position.set(800 - 150, 260);
+		controlFlash.position.set(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		container.addChild(controlFlash);
 
 		controlFlashPressed.anchor.set(0.5, 0.5);
-		controlFlashPressed.position.set(800 - 150, 260);
+		controlFlashPressed.position.set(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		controlFlashPressed.visible = false;
 		container.addChild(controlFlashPressed);
 
-		const {normalizeDirec, contraryVector, app, snake} = this;
+		const {normalizeDirec, contraryVector, app, mySnake} = this;
 		const self = this;
 		this.pointerHandler = {
 			isControlPointerDown: false, //是否点击了控制区域
 			controlBackOrigin: {
-				x: 150,
-				y: 260
+				x: 150 / CONTROLLER_BASE_WIDTH * SCREEN.width,
+				y: 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height
 			},
-			controlBackBounding: new Sphere(150, 260, 40), //设置控制区域所在的圆，用于计算点击位置是否在包围圆内
-			controlFlashPressedBouding: new Sphere(800 - 150, 260, 40),
+			controlBackBounding: new Sphere(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40), //设置控制区域所在的圆，用于计算点击位置是否在包围圆内
+			controlFlashPressedBouding: new Sphere(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40),
 			matrix: new Matrix(),
 			accOrSlowDown: 1,
 			advanceCallback: function (accOrSlowDown) {
@@ -65,17 +65,17 @@ class Controller {
 				}
 			},
 			advance: function () {
-				snake.advance(this.accOrSlowDown, this.advanceCallback, this);
+				mySnake.advance(this.accOrSlowDown, this.advanceCallback, this);
 			},
 			pointerDown(e) {
-				if (this.controlBackBounding.surroundPoint(e.point)) {
+				if (this.controlBackBounding.surroundPoint(e.val)) {
 					this.isControlPointerDown = true;
-					self.setRockerPos(this.matrix, e.point, this.controlBackOrigin);
+					self.setRockerPos(this.matrix, e.val, this.controlBackOrigin);
 					//更新地图移动的方向
-					const direc = normalizeDirec({x: -e.point.x + this.controlBackOrigin.x, y: -e.point.y + this.controlBackOrigin.y});
-					snake.turnAround(contraryVector(direc));
+					const direc = normalizeDirec({x: -e.val.x + this.controlBackOrigin.x, y: -e.val.y + this.controlBackOrigin.y});
+					mySnake.turnAround(contraryVector(direc));
 				}
-				if (this.controlFlashPressedBouding.surroundPoint(e.point)) {
+				if (this.controlFlashPressedBouding.surroundPoint(e.val)) {
 					this.accOrSlowDown = 1;
 					app.ticker.add(this.advance, this);
 					self.toggleFlashPressed(true);
@@ -83,37 +83,34 @@ class Controller {
 			},
 			pinterMove(e) {
 				if (this.isControlPointerDown) {
-					self.setRockerPos(this.matrix, e.point, this.controlBackOrigin);
-					const direc = normalizeDirec({x: -e.point.x + this.controlBackOrigin.x, y: -e.point.y + this.controlBackOrigin.y});
-					snake.turnAround(contraryVector(direc));
+					self.setRockerPos(this.matrix, e.val, this.controlBackOrigin);
+					const direc = normalizeDirec({x: -e.val.x + this.controlBackOrigin.x, y: -e.val.y + this.controlBackOrigin.y});
+					mySnake.turnAround(contraryVector(direc));
 				}
 			},
 			pointerUp(e) {
 				this.isControlPointerDown = false;
 				controlRocker.position.set(this.controlBackOrigin.x, this.controlBackOrigin.y);
-				if (this.controlFlashPressedBouding.surroundPoint(e.point)) {
+				if (this.controlFlashPressedBouding.surroundPoint(e.val)) {
 					this.accOrSlowDown = -1;
 					app.ticker.add(this.advance, this);
 					self.toggleFlashPressed(false);
 				}
 			}
 		}
+		this.registerEventHandler();
 	}
-	eventHandler(ev) {
+	registerEventHandler() {
 		const { pointerHandler } = this;
-		/* eslint-disable */
-		switch(ev.type) {
-			case 'pointerdown':
-				pointerHandler.pointerDown(ev);
-				break;
-			case 'pointermove':
-				pointerHandler.pinterMove(ev);
-				break;
-			case 'pointerup':
-				pointerHandler.pointerUp(ev);
-				break;
-		}
-		/* eslint-enable */
+		EventController.subscribe('pointerdown', ev => {
+			pointerHandler.pointerDown(ev);
+		});
+		EventController.subscribe('pointermove', ev => {
+			pointerHandler.pinterMove(ev);
+		});
+		EventController.subscribe('pointerup', ev => {
+			pointerHandler.pointerUp(ev);
+		});
 	}
 	//设置控制球的位置
 	setRockerPos(matrix, p2, p1) {

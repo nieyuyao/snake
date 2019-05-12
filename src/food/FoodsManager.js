@@ -10,8 +10,10 @@ import {
 	_OFFSET_CANVAS_HEIGHT,
 	HORIZONTAL_DIVISION_NUM,
 	VERTICAL__DIVISION_NUM,
-	DIVISION_WIDTH
+	DIVISION_WIDTH,
+	DIE_SNAKE_SCORE
 } from '../utils/constants';
+import EventController from '../event/EventController';
 
 class FoodsManager {
 	constructor() {
@@ -52,27 +54,48 @@ class FoodsManager {
 			container.addChild(food.sprite);
 		}
 		this.generateFood();
+		// 监听蛇死亡时的分数
+		const self = this;
+		this.eventHandler = function (ev) {
+			self.createFoodFromSnakePos(ev.val);
+		}
+		EventController.subscribe(DIE_SNAKE_SCORE, this.eventHandler);
 	}
 	/**
 	 * 创建食物
+	 * @param {Number} fx // 食物位置x
+	 * @param {Number} fy // 食物位置y
 	 */
-	createFood() {
+	createFood(fx, fy) {
 		const {
 			foods,
-			division
+			division,
+			container
 		} = this;
 		if (foods[this.idleOrder] && this.idleOrder < foods.length) {
 			this.idleOrder++;
-			return this.createFood();
+			return this.createFood(fx, fy);
 		}
-		const ix = Math.floor(Math.random() * HORIZONTAL_DIVISION_NUM);
-		const iy = Math.floor(Math.random() * VERTICAL__DIVISION_NUM);
-		const x = ix * DIVISION_WIDTH + 16 + 1 + Math.random() * (DIVISION_WIDTH - 2 * 16 - 2);
-		const y = iy * DIVISION_WIDTH + 16 + 1 + Math.random() * (DIVISION_WIDTH - 2 * 16 - 2);
+		let ix = 0;
+		let iy = 0
+		let x = 0;
+		let y = 0;
+		if (typeof fx === 'number' && typeof fy === 'number') {
+			ix = Math.floor(fx / DIVISION_WIDTH);
+			iy = Math.floor(fy / DIVISION_WIDTH);
+			x = fx;
+			y = fy;
+		} else {
+			ix = Math.floor(Math.random() * HORIZONTAL_DIVISION_NUM);
+			iy = Math.floor(Math.random() * VERTICAL__DIVISION_NUM);
+			x = ix * DIVISION_WIDTH + 16 + 1 + Math.random() * (DIVISION_WIDTH - 2 * 16 - 2);
+			y = iy * DIVISION_WIDTH + 16 + 1 + Math.random() * (DIVISION_WIDTH - 2 * 16 - 2);
+		}
 		const divisionKey = `_${ix}_${iy}`;
 		const type = Math.ceil(Math.random() * 6);
 		const food = new Food(x, y, type, this.idleOrder, divisionKey);
-		this.foods[this.idleOrder] = food;
+		container.addChild(food.sprite);
+		foods[this.idleOrder] = food;
 		division[divisionKey][this.idleOrder] = 1;
 		return food;
 	}
@@ -138,11 +161,15 @@ class FoodsManager {
 			}
 		}
 	}
+	// 检查食物是否被吃掉
 	checkFoodIsEaten() {
 		const { foods, division, sm } = this;
 		const { snakes } = sm;
 		for (let si = 0; si < snakes.length; si++) {
 			const snake = snakes[si];
+			if (!snake) {
+				continue;
+			}
 			const pos = snake.getPos();
 			const ix = Math.floor(pos.x / DIVISION_WIDTH);
 			const iy = Math.floor(pos.y / DIVISION_WIDTH);
@@ -177,6 +204,14 @@ class FoodsManager {
 				}
 			}
 		}
+	}
+	createFoodFromSnakePos({score = 0, positions = []}) {
+		for (let p = 0; p < positions.length; p++) {
+			this.createFood(positions[p].x, positions[p].y);
+		}
+	}
+	destory() {
+		EventController.remove(DIE_SNAKE_SCORE, this.eventHandler);
 	}
 }
 export default FoodsManager;

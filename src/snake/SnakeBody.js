@@ -73,6 +73,9 @@ class SnakeBody {
 		pos.x = x;
 		pos.y = y;
 	}
+	destory() {
+		this.sprite.destroy();
+	}
 }
 
 export default SnakeBody;

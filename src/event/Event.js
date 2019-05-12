@@ -1,10 +1,7 @@
 class Event {
-	constructor(type = '', x = 0, y = 0) {
+	constructor(type = '', val) {
 		this.type = type;
-		this.point = {
-			x: x,
-			y: y
-		}
+		this.val = val;
 	}
 }
 export default Event;
