@@ -85,5 +85,9 @@ class GameMap {
 		mPoint.x = -x;
 		mPoint.y = -y;
 	}
+	destory() {
+		this.mapSprite.destroy();
+		this.container.destroy();
+	}
 }
 export default GameMap;

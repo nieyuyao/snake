@@ -1,6 +1,7 @@
 import { Sprite, Texture } from 'pixi.js';
 import { crossProduct, isEqualVector, Sphere } from '../utils/Bound';
 import Interpolation from '../utils/Interpolation';
+import { TEXTURES } from '../utils/constants'
 
 class SnakeBody {
 	/**
@@ -22,7 +23,14 @@ class SnakeBody {
 	}
 	init() {
 		const frame = this.type + this.cate + '.png';
-		this.sprite = new Sprite(Texture.fromFrame(frame));
+		let texture;
+		if (TEXTURES[frame]) {
+			texture = TEXTURES[frame];
+		} else {
+			texture = Texture.fromFrame(frame);
+			TEXTURES[frame] = texture;
+		}
+		this.sprite = new Sprite(texture);
 		this.sprite.scale.set(0.4, 0.4);
 		this.sprite.anchor.set(0.5, 0.5);
 		const { precursor, sprite, direc, pos } = this;
