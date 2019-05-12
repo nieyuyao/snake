@@ -8,16 +8,17 @@ import {
 } from 'pixi.js';
 import EventController from './event/EventController';
 import { Sphere } from './utils/Bound';
-import { SCREEN, CONTROLLER_BASE_WIDTH, CONTROLLER_BASE_HEIGHT, SCORE_WIDTH, SCORE_HEIGHT } from './utils/constants';
+import { SCREEN, CONTROLLER_BASE_WIDTH, CONTROLLER_BASE_HEIGHT, SCORE_WIDTH, SCORE_HEIGHT, SCORE_TEXT_STYLE } from './utils/constants';
 
 class Controller {
-	constructor(app, map, mySnake) {
+	constructor(app, map, sm, mySnake) {
 		this.name = 'controller';
 		this.container = new Container();
 		this.app = app;
 		this.map = map; //地图
 		this.mySnake = mySnake;
 		this.scoreTexts = [];
+		this.sm = sm;
 	}
 	init() {
 		this.controlBack = new Sprite(Texture.fromFrame('control-back.png'));
@@ -70,12 +71,6 @@ class Controller {
 
 		const {normalizeDirec, contraryVector, app, mySnake} = this;
 
-		const style = new PIXI.TextStyle({
-			fontFamily: 'Arial',
-			fontSize: 18,
-			fill: '#ffffff' // gradient
-		});
-
 		const self = this;
 		this.pointerHandler = {
 			isControlPointerDown: false, //是否点击了控制区域
@@ -127,6 +122,11 @@ class Controller {
 			}
 		}
 		this.registerEventHandler();
+
+		// 更新分数
+		app.ticker.add(() => {
+			this.updateScore();
+		});
 	}
 	registerEventHandler() {
 		const { pointerHandler } = this;
@@ -174,6 +174,30 @@ class Controller {
 			x: -v.x,
 			y: -v.y
 		}
+	}
+	updateScore() {
+		const {scoreTexts, score, sm} = this;
+		const sScores = sm.snakes.filter(snake => snake !== undefined).map(snake => ({
+			id: snake.id,
+			score: snake.score
+		}));
+		sScores.sort((a, b) => (a.score > b.score ? -1 : 1));
+		/* eslint-disable vars-on-top, no-var, block-scoped-var */
+		for (var i = 0; i < sScores.length; i++) {
+			if (!scoreTexts[i]) {
+				scoreTexts[i] = new Text(sScores[i].id + ': ' + sScores[i].score, SCORE_TEXT_STYLE);
+				score.addChild(scoreTexts[i]);
+			} else {
+				scoreTexts[i].text = sScores[i].id + ': ' + sScores[i].score;
+			}
+			scoreTexts[i].position.set(0, i * 20);
+		}
+		if (i < scoreTexts.length) {
+			for (; i < scoreTexts.length; i++) {
+				scoreTexts[i].text = '';
+			}
+		}
+		/* eslint-enable */
 	}
 }
 export default Controller;

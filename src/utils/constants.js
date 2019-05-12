@@ -1,3 +1,5 @@
+import { TextStyle } from 'pixi.js';
+
 export const FOOD_NUM_MAX = 1000;	//食物的最大数量
 export const FOOD_NUM_MIN = 100;	//食物的最小数量
 export const _OFFSET_CANVAS_WIDTH = 3000; //食物绘图离屏canvas的宽
@@ -33,3 +35,8 @@ export const SCREEN = {
 	height: 0
 };
 export const TEXTURES = {}; //纹理
+export const SCORE_TEXT_STYLE = new TextStyle({
+	fontFamily: 'Arial',
+	fontSize: 18,
+	fill: '#ffffff'
+});

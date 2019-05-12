@@ -18,9 +18,8 @@ class Game {
 		this.snakeManager = new SnakeManager();
 		this.gameMap = new GameMap(this.app);
 		const mySnake = this.snakeManager.createSnake();
-		this.controller = new Controller(this.app, this.gameMap, mySnake);
+		this.controller = new Controller(this.app, this.gameMap, this.snakeManager, mySnake);
 		this.ai = new Ai(this.snakeManager);
-		// this.aiSnake = new AiSnake();
 		this.foodsManager.init(this.snakeManager);
 		this.snakeManager.init();
 		// 初始化地图
