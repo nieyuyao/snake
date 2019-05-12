@@ -51,7 +51,8 @@ class Food {
 		const dx = this.x - val.x;
 		const dy = this.y - val.y;
 		if (dx * dx + dy * dy < 1) {
-			this.destory();
+			this.visible = false;
+			this.sprite.visible = false;
 			return;
 		}
 		this.x = val.x;
@@ -62,7 +63,6 @@ class Food {
 	 * 销毁食物
 	 */
 	destory() {
-		this.visible = false;
 		this.sprite.destroy();
 	}
 }

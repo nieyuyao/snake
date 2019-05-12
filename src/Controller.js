@@ -2,11 +2,13 @@ import {
 	Texture,
 	Container,
 	Sprite,
-	Matrix
+	Matrix,
+	Graphics,
+	Text
 } from 'pixi.js';
 import EventController from './event/EventController';
 import { Sphere } from './utils/Bound';
-import { SCREEN, CONTROLLER_BASE_WIDTH, CONTROLLER_BASE_HEIGHT } from './utils/constants';
+import { SCREEN, CONTROLLER_BASE_WIDTH, CONTROLLER_BASE_HEIGHT, SCORE_WIDTH, SCORE_HEIGHT } from './utils/constants';
 
 class Controller {
 	constructor(app, map, mySnake) {
@@ -15,19 +17,24 @@ class Controller {
 		this.app = app;
 		this.map = map; //地图
 		this.mySnake = mySnake;
+		this.scoreTexts = [];
 	}
 	init() {
 		this.controlBack = new Sprite(Texture.fromFrame('control-back.png'));
 		this.controlRocker = new Sprite(Texture.fromFrame('control-rocker.png'));
 		this.controlFlash = new Sprite(Texture.fromFrame('control-flash.png'));
 		this.controlFlashPressed = new Sprite(Texture.fromFrame('control-flash-pressed.png'));
-		
+		this.cancel = new Sprite(Texture.fromFrame('btn-back.png')); //返回按钮
+		this.score = new Container();
+
 		const {
 			container,
 			controlBack,
 			controlRocker,
 			controlFlash,
-			controlFlashPressed
+			controlFlashPressed,
+			cancel,
+			score
 		} = this;
 
 		controlBack.anchor.set(0.5, 0.5);
@@ -46,8 +53,29 @@ class Controller {
 		controlFlashPressed.position.set(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		controlFlashPressed.visible = false;
 		container.addChild(controlFlashPressed);
+		
+		cancel.anchor.set(0.5, 0.5);
+		cancel.position.set(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 40 / CONTROLLER_BASE_HEIGHT * SCREEN.height)
+		container.addChild(cancel);
+
+		score.width = SCORE_WIDTH;
+		score.height = SCORE_HEIGHT;
+		score.position.set(SCREEN.width - SCORE_WIDTH, 0);
+		const graphics = new Graphics();
+		graphics.beginFill(0x000000, 0.4);
+		graphics.drawRect(0, 0, SCORE_WIDTH, SCORE_HEIGHT);
+		graphics.endFill();
+		score.addChild(graphics);
+		container.addChild(score);
 
 		const {normalizeDirec, contraryVector, app, mySnake} = this;
+
+		const style = new PIXI.TextStyle({
+			fontFamily: 'Arial',
+			fontSize: 18,
+			fill: '#ffffff' // gradient
+		});
+
 		const self = this;
 		this.pointerHandler = {
 			isControlPointerDown: false, //是否点击了控制区域

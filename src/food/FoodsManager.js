@@ -110,6 +110,7 @@ class FoodsManager {
 		if (this.idleOrder > order) {
 			this.idleOrder = order;
 		}
+		food.destory();
 		delete this.foods[order];
 	}
 	/**
