@@ -14,7 +14,6 @@ class Controller {
 		this.app = app;
 		this.map = map; //地图
 		this.snake = snake;
-		EventController.subscribe(this);
 	}
 	init() {
 		this.controlBack = new Sprite(Texture.fromFrame('control-back.png'));
@@ -68,14 +67,14 @@ class Controller {
 				snake.advance(this.accOrSlowDown, this.advanceCallback, this);
 			},
 			pointerDown(e) {
-				if (this.controlBackBounding.surroundPoint(e.point)) {
+				if (this.controlBackBounding.surroundPoint(e.val)) {
 					this.isControlPointerDown = true;
-					self.setRockerPos(this.matrix, e.point, this.controlBackOrigin);
+					self.setRockerPos(this.matrix, e.val, this.controlBackOrigin);
 					//更新地图移动的方向
-					const direc = normalizeDirec({x: -e.point.x + this.controlBackOrigin.x, y: -e.point.y + this.controlBackOrigin.y});
+					const direc = normalizeDirec({x: -e.val.x + this.controlBackOrigin.x, y: -e.val.y + this.controlBackOrigin.y});
 					snake.turnAround(contraryVector(direc));
 				}
-				if (this.controlFlashPressedBouding.surroundPoint(e.point)) {
+				if (this.controlFlashPressedBouding.surroundPoint(e.val)) {
 					this.accOrSlowDown = 1;
 					app.ticker.add(this.advance, this);
 					self.toggleFlashPressed(true);
@@ -83,37 +82,34 @@ class Controller {
 			},
 			pinterMove(e) {
 				if (this.isControlPointerDown) {
-					self.setRockerPos(this.matrix, e.point, this.controlBackOrigin);
-					const direc = normalizeDirec({x: -e.point.x + this.controlBackOrigin.x, y: -e.point.y + this.controlBackOrigin.y});
+					self.setRockerPos(this.matrix, e.val, this.controlBackOrigin);
+					const direc = normalizeDirec({x: -e.val.x + this.controlBackOrigin.x, y: -e.val.y + this.controlBackOrigin.y});
 					snake.turnAround(contraryVector(direc));
 				}
 			},
 			pointerUp(e) {
 				this.isControlPointerDown = false;
 				controlRocker.position.set(this.controlBackOrigin.x, this.controlBackOrigin.y);
-				if (this.controlFlashPressedBouding.surroundPoint(e.point)) {
+				if (this.controlFlashPressedBouding.surroundPoint(e.val)) {
 					this.accOrSlowDown = -1;
 					app.ticker.add(this.advance, this);
 					self.toggleFlashPressed(false);
 				}
 			}
 		}
+		this.registerEventHandler();
 	}
-	eventHandler(ev) {
+	registerEventHandler() {
 		const { pointerHandler } = this;
-		/* eslint-disable */
-		switch(ev.type) {
-			case 'pointerdown':
-				pointerHandler.pointerDown(ev);
-				break;
-			case 'pointermove':
-				pointerHandler.pinterMove(ev);
-				break;
-			case 'pointerup':
-				pointerHandler.pointerUp(ev);
-				break;
-		}
-		/* eslint-enable */
+		EventController.subscribe('pointerdown', ev => {
+			pointerHandler.pointerDown(ev);
+		});
+		EventController.subscribe('pointermove', ev => {
+			pointerHandler.pinterMove(ev);
+		});
+		EventController.subscribe('pointerup', ev => {
+			pointerHandler.pointerUp(ev);
+		});
 	}
 	//设置控制球的位置
 	setRockerPos(matrix, p2, p1) {

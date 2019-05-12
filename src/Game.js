@@ -15,17 +15,16 @@ class Game {
 	}
 	init() {
 		this.foodsManager = new FoodsManager();
-		this.mySnake = new Snake();
 		this.snakeManager = new SnakeManager();
 		this.gameMap = new GameMap(this.app);
-		this.controller = new Controller(this.app, this.gameMap, this.mySnake);
+		const mySnake = this.snakeManager.createSnake();
+		this.controller = new Controller(this.app, this.gameMap, mySnake);
 		this.ai = new Ai(this.snakeManager);
 		// this.aiSnake = new AiSnake();
 		this.foodsManager.init(this.snakeManager);
 		this.snakeManager.init();
-		this.snakeManager.setMySnake(this.mySnake);
 		// 初始化地图
-		this.gameMap.init(this.foodsManager, this.snakeManager, this.mySnake);
+		this.gameMap.init(this.foodsManager, this.snakeManager, mySnake);
 		// 初始化控制器
 		this.controller.init();
 		const {
@@ -72,22 +71,34 @@ class Game {
 	initEventListeners() {
 		const { app } = this;
 		app.view.addEventListener('pointerenter', (e) => {
-			EventController.publish(new Event('pointerenter', e.clientX, e.clientY));
+			EventController.publish(new Event('pointerenter', { 
+				x: e.clientX, y: e.clientY
+			}));
 		});
 		app.view.addEventListener('pointerleave', (e) => {
-			EventController.publish(new Event('pointerleave', e.clientX, e.clientY));
+			EventController.publish(new Event('pointerleave', { 
+				x: e.clientX, y: e.clientY
+			}));
 		});
 		app.view.addEventListener('pointerdown', (e) => {
-			EventController.publish(new Event('pointerdown', e.clientX, e.clientY));
+			EventController.publish(new Event('pointerdown', { 
+				x: e.clientX, y: e.clientY
+			}));
 		});
 		app.view.addEventListener('pointermove', (e) => {
-			EventController.publish(new Event('pointermove', e.clientX, e.clientY));
+			EventController.publish(new Event('pointermove', { 
+				x: e.clientX, y: e.clientY
+			}));
 		});
 		app.view.addEventListener('pointerup', (e) => {
-			EventController.publish(new Event('pointerup', e.clientX, e.clientY));
+			EventController.publish(new Event('pointerup', { 
+				x: e.clientX, y: e.clientY
+			}));
 		});
 		app.view.addEventListener('pointerout', (e) => {
-			EventController.publish(new Event('pointerout', e.clientX, e.clientY));
+			EventController.publish(new Event('pointerout', { 
+				x: e.clientX, y: e.clientY
+			}));
 		});
 	}
 	/**

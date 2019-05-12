@@ -4,17 +4,16 @@ import SnakeHead from './SnakeHead';
 import EventController from '../event/EventController';
 import Event from '../event/Event';
 import Collision from '../utils/Collision';
-import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SCREEN } from '../utils/constants';
+import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SNAKE_DIE_EVENT_NAME } from '../utils/constants';
 
 /**
  * 玩家自己的蛇
  */
 class Snake {
 	/**
-	 * @param {Object} headInitialPos 蛇头的初始位置
-	 * @param {Number} id
+	 * @param {SnakeManager} sm 蛇管理器
 	 */
-	constructor() {
+	constructor(sm) {
 		this.name = 'Snake';
 		this.head = null;
 		this.bodies = [];
@@ -26,6 +25,8 @@ class Snake {
 		this.VEC_MIN = 2;
 		this.a = 0.1;
 		this.score = 0;
+		this.died = false;
+		this.sm = sm;
 	}
 	/**
 	 * 初始化
@@ -37,7 +38,7 @@ class Snake {
 		this.id = id;
 		const { bodies, cate, bodyContainer, container } = this;
 		// 蛇头
-		this.head = new SnakeHead(null, cate, 'head', startPos, startDirec, this);
+		this.head = new SnakeHead(null, cate, 'head', startPos, startDirec, this, this.sm);
 		// 蛇身
 		const body1 = new SnakeBody(this.head, cate, 'body');
 		const body2 = new SnakeBody(body1, cate, 'body');
@@ -69,6 +70,11 @@ class Snake {
 	}
 	// 每帧更新
 	update() {
+		if (this.died) {
+			//TODO:死亡动画
+			this.disintegrate();
+			return;
+		}
 		this.head.updateHeadDirec();
 		this.head.updateHeadPos(this.v);
 		for (let i = 0; i < this.bodies.length; i++) {
@@ -120,6 +126,21 @@ class Snake {
 	// 取到蛇头的位置
 	getPos() {
 		return this.head.pos;
+	}
+	// 解体
+	disintegrate() {
+		console.log('disintegrate');
+		EventController.publish(new Event(SNAKE_DIE_EVENT_NAME, this.id));
+	}
+	// 死亡
+	die() {
+		this.died = true;
+	}
+	destory() {
+		this.head.destory();
+		for (let i = 0; i < this.bodies.length; i++) {
+			this.bodies[i].destory();
+		}
 	}
 }
 

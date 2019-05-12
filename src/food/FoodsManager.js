@@ -143,6 +143,9 @@ class FoodsManager {
 		const { snakes } = sm;
 		for (let si = 0; si < snakes.length; si++) {
 			const snake = snakes[si];
+			if (!snake) {
+				return;
+			}
 			const pos = snake.getPos();
 			const ix = Math.floor(pos.x / DIVISION_WIDTH);
 			const iy = Math.floor(pos.y / DIVISION_WIDTH);

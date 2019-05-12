@@ -1,17 +1,18 @@
 import { Sprite, Texture } from 'pixi.js';
 import SnakeBody from './SnakeBody';
-import { crossProduct, Sphere } from '../utils/Bound';
+import { crossProduct, Sphere, squareDistance } from '../utils/Bound';
 import Interpolation from '../utils/Interpolation';
-import { SNAKE_BOUND } from '../utils/constants';
+import { SNAKE_BOUND, SNAKE_DIE_RADIUS } from '../utils/constants';
 
 class SnakeHead extends SnakeBody {
-	constructor(precursor, cate = 1, type, startPos, startDirec, parent) {
+	constructor(precursor, cate = 1, type, startPos, startDirec, parent, sm) {
 		super(precursor, cate, type);
 		this.name = 'SnakeHead';
 		this.pos = startPos;
 		this.direc = startDirec;
 		this.parent = parent;
 		this.direcInterp = null;
+		this.sm = sm;
 		this.init();
 	}
 	init() {
@@ -67,6 +68,7 @@ class SnakeHead extends SnakeBody {
 		const h = sprite.height / 2;
 		pos.x = x;
 		pos.y = y;
+		this.checkCollide();
 		if (x - w <= left) {
 			pos.x = left + w;
 			pos.y = y;
@@ -82,6 +84,26 @@ class SnakeHead extends SnakeBody {
 			pos.y = bottom - h;
 		}
 		sprite.position.set(pos.x, pos.y);
+	}
+	checkCollide() {
+		const { snakes } = this.sm;
+		const thisSnake = this.parent;
+		const thisSnakePos = this.parent.getPos();
+		for (let si = 0, sl = snakes.length; si < sl; si++) {
+			const snake = snakes[si];
+			// 如果是自己不检测
+			if (snake === thisSnake || !snake) {
+				continue;
+			}
+			const bodies = snake.bodies;
+			for (let bi = 0, bl = bodies.length; bi < bl; bi++) {
+				const body = bodies[bi];
+				// 死亡
+				if (squareDistance(thisSnakePos, body.pos) <= SNAKE_DIE_RADIUS) {
+					this.parent.die();
+				}
+			}
+		}
 	}
 }
 

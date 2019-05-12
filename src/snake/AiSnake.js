@@ -9,10 +9,9 @@ import { _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, INITIAL_SNAKE_BODY_NUM, SN
  */
 class AiSnakeHead extends SnakeHead {
 	constructor(precursor, cate = 1, type, startPos, startDirec, parent, sm) {
-		super(precursor, cate, type, startPos, startDirec);
+		super(precursor, cate, type, startPos, startDirec, parent, sm);
 		this.name = 'AiSnakeHead';
 		this.sm = sm;
-		this.parent = parent;
 		this.canCheckedIsWillCollide = true; // 是否可以进行即将碰撞检测
 		this.cTimer = -1; // 计时器句柄
 	}
@@ -25,7 +24,7 @@ class AiSnakeHead extends SnakeHead {
 		for (let si = 0, sl = snakes.length; si < sl; si++) {
 			const snake = snakes[si];
 			// 如果是自己不检测
-			if (snake === thisSnake) {
+			if (snake === thisSnake || !snake) {
 				continue;
 			}
 			const bodies = snake.bodies;
@@ -34,7 +33,7 @@ class AiSnakeHead extends SnakeHead {
 				// 死亡
 				if (squareDistance(thisSnakePos, body.pos) <= SNAKE_DIE_RADIUS) {
 					//TODO:
-					console.log('die', thisSnake.id);
+					this.parent.die();
 				}
 				if (!this.canCheckedIsWillCollide) {
 					return;
@@ -106,12 +105,15 @@ class AiSnakeHead extends SnakeHead {
 			clearTimeout(this.cTimer);
 		}, AI_SNAKE_WILL_COLLISION_TIME);
 	}
+	destory() {
+		this.sprite.destroy();
+		clearTimeout(this.cTimer);
+	}
 }
 class AiSnake extends Snake {
 	constructor(sm) {
-		super();
+		super(sm);
 		this.name = 'AiSnake';
-		this.sm = sm;
 	}
 	init(id, startPos, startDirec) {
 		this.id = id;
