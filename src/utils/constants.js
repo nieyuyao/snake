@@ -21,6 +21,8 @@ export const SNAKE_A = 0.1; //蛇的加速度
 export const SNAKE_VEC_MAX = 4; //蛇的最大速度
 export const SNAKE_VEC_MIN = 2; //蛇的最小速度
 export const SNAKE_VEC_0 = 2; //蛇的初始速度
+export const CONTROLLER_BASE_WIDTH = 800; //控制器基准宽，用来计算定位
+export const CONTROLLER_BASE_HEIGHT = 400; //控制器基准高，用来计算定位
 export const SNAKE_BOUND = {
 	left: 0,
 	right: _OFFSET_CANVAS_WIDTH,

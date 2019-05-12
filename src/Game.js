@@ -31,10 +31,8 @@ class Game {
 			gameMap,
 			controller,
 			app,
-			aiSnake,
 			ai
 		} = this;
-		// ai.addSnake(aiSnake);
 		ai.createAiSnake();
 		ai.createAiSnake();
 		ai.createAiSnake();
@@ -59,7 +57,6 @@ class Game {
 		ai.createAiSnake();
 		ai.createAiSnake();
 		ai.createAiSnake();
-		window.ai = ai;
 		app.stage.addChild(gameMap.container);
 		app.stage.addChild(controller.container);
 		this.initEventListeners();
