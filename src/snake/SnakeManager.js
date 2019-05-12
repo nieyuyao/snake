@@ -1,5 +1,5 @@
 import { Point, Container } from 'pixi.js';
-import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, SNAKE_DIE_EVENT_NAME } from '../utils/constants';
+import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, SNAKE_DIE_EVENT_NAME, DIE_SNAKE_SCORE } from '../utils/constants';
 import EventController from '../event/EventController';
 import Event from '../event/Event';
 import Snake from './Snake';
@@ -59,7 +59,10 @@ class SnakeManager {
 	removeSnake(id) {
 		const snake = this.snakes[id];
 		snake.destory();
-		// EventController.publish();
+		EventController.publish(new Event(DIE_SNAKE_SCORE, {
+			score: snake.score,
+			positions: snake.getAllBodyPos()
+		}));
 		delete this.snakes[id];
 	}
 	/**
