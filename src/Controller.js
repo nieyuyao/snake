@@ -35,33 +35,52 @@ class Controller {
 			controlFlash,
 			controlFlashPressed,
 			cancel,
-			score
+			score,
+			app
 		} = this;
 
 		controlBack.anchor.set(0.5, 0.5);
 		controlBack.position.set(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
+		if (app.shouldHorizontalScreen) {
+			controlBack.position.set(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
+		}
 		container.addChild(controlBack);
 
 		controlRocker.anchor.set(0.5, 0.5);
 		controlRocker.position.set(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
+		if (app.shouldHorizontalScreen) {
+			controlRocker.position.set(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
+		}
 		container.addChild(controlRocker);
 
 		controlFlash.anchor.set(0.5, 0.5);
 		controlFlash.position.set(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
+		if (app.shouldHorizontalScreen) {
+			controlFlash.position.set(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
+		}
 		container.addChild(controlFlash);
 
 		controlFlashPressed.anchor.set(0.5, 0.5);
 		controlFlashPressed.position.set(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
+		if (app.shouldHorizontalScreen) {
+			controlFlashPressed.position.set(260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
+		}
 		controlFlashPressed.visible = false;
 		container.addChild(controlFlashPressed);
 		
 		cancel.anchor.set(0.5, 0.5);
-		cancel.position.set(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 40 / CONTROLLER_BASE_HEIGHT * SCREEN.height)
+		cancel.position.set(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 40 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
+		if (app.shouldHorizontalScreen) {
+			cancel.position.set(40 / CONTROLLER_BASE_HEIGHT * SCREEN.width, 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
+		}
 		container.addChild(cancel);
 
 		score.width = SCORE_WIDTH;
 		score.height = SCORE_HEIGHT;
 		score.position.set(SCREEN.width - SCORE_WIDTH, 0);
+		if (app.shouldHorizontalScreen) {
+			score.position.set(0, SCREEN.height - SCORE_WIDTH);
+		}
 		const graphics = new Graphics();
 		graphics.beginFill(0x000000, 0.4);
 		graphics.drawRect(0, 0, SCORE_WIDTH, SCORE_HEIGHT);
@@ -69,17 +88,35 @@ class Controller {
 		score.addChild(graphics);
 		container.addChild(score);
 
-		const {normalizeDirec, contraryVector, app, mySnake} = this;
+		const {normalizeDirec, contraryVector, mySnake} = this;
 
 		const self = this;
 		this.pointerHandler = {
 			isControlPointerDown: false, //是否点击了控制区域
-			controlBackOrigin: {
-				x: 150 / CONTROLLER_BASE_WIDTH * SCREEN.width,
-				y: 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height
-			},
-			controlBackBounding: new Sphere(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40), //设置控制区域所在的圆，用于计算点击位置是否在包围圆内
-			controlFlashPressedBouding: new Sphere(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40),
+			controlBackOrigin: (() => {
+				if (app.shouldHorizontalScreen) {
+					return {
+						x: 260 / CONTROLLER_BASE_HEIGHT * SCREEN.width,
+						y: 150 / CONTROLLER_BASE_WIDTH * SCREEN.height,
+					};
+				}
+				return {
+					x: 150 / CONTROLLER_BASE_WIDTH * SCREEN.width,
+					y: 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height
+				}
+			})(),
+			controlBackBounding: (() => {
+				if (app.shouldHorizontalScreen) {
+					return new Sphere(260 / CONTROLLER_BASE_WIDTH * SCREEN.height, 150 / CONTROLLER_BASE_HEIGHT * SCREEN.width, 40);
+				}
+				return new Sphere(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40);
+			})(), //设置控制区域所在的圆，用于计算点击位置是否在包围圆内
+			controlFlashPressedBouding: (() => {
+				if (app.shouldHorizontalScreen) {
+					return new Sphere(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height, 40);
+				}
+				return new Sphere(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40);
+			})(),
 			matrix: new Matrix(),
 			accOrSlowDown: 1,
 			advanceCallback: function (accOrSlowDown) {
@@ -114,11 +151,12 @@ class Controller {
 			pointerUp(e) {
 				this.isControlPointerDown = false;
 				controlRocker.position.set(this.controlBackOrigin.x, this.controlBackOrigin.y);
-				if (this.controlFlashPressedBouding.surroundPoint(e.val)) {
-					this.accOrSlowDown = -1;
-					app.ticker.add(this.advance, this);
-					self.toggleFlashPressed(false);
-				}
+				// if (this.controlFlashPressedBouding.surroundPoint(e.val)) {
+				this.accOrSlowDown = -1;
+				app.ticker.add(this.advance, this);
+				self.toggleFlashPressed(false);
+
+				// }
 			}
 		}
 		this.registerEventHandler();

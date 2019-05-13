@@ -66,35 +66,52 @@ class Game {
 	 */
 	initEventListeners() {
 		const { app } = this;
-		app.view.addEventListener('pointerenter', (e) => {
-			EventController.publish(new Event('pointerenter', { 
-				x: e.clientX, y: e.clientY
-			}));
-		});
-		app.view.addEventListener('pointerleave', (e) => {
-			EventController.publish(new Event('pointerleave', { 
-				x: e.clientX, y: e.clientY
-			}));
-		});
-		app.view.addEventListener('pointerdown', (e) => {
+		// app.view.addEventListener('pointerenter', (e) => {
+		// 	EventController.publish(new Event('pointerenter', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// app.view.addEventListener('pointerleave', (e) => {
+		// 	EventController.publish(new Event('pointerleave', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// app.view.addEventListener('pointerdown', (e) => {
+		// 	EventController.publish(new Event('pointerdown', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// app.view.addEventListener('pointermove', (e) => {
+		// 	EventController.publish(new Event('pointermove', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// app.view.addEventListener('pointerup', (e) => {
+		// 	EventController.publish(new Event('pointerup', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// app.view.addEventListener('pointerout', (e) => {
+		// 	EventController.publish(new Event('pointerout', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// touch
+		app.view.addEventListener('touchstart', (e) => {
 			EventController.publish(new Event('pointerdown', { 
-				x: e.clientX, y: e.clientY
+				x: e.touches[0].clientX, y: e.touches[0].clientY
 			}));
 		});
-		app.view.addEventListener('pointermove', (e) => {
+		app.view.addEventListener('touchmove', (e) => {
 			EventController.publish(new Event('pointermove', { 
-				x: e.clientX, y: e.clientY
+				x: e.touches[0].clientX, y: e.touches[0].clientY
 			}));
 		});
-		app.view.addEventListener('pointerup', (e) => {
-			EventController.publish(new Event('pointerup', { 
-				x: e.clientX, y: e.clientY
-			}));
-		});
-		app.view.addEventListener('pointerout', (e) => {
-			EventController.publish(new Event('pointerout', { 
-				x: e.clientX, y: e.clientY
-			}));
+		app.view.addEventListener('touchend', (e) => {
+			EventController.publish(new Event('pointerup'));
+			// EventController.publish(new Event('pointerup', { 
+			// 	x: e.touches[0].clientX, y: e.touches[0].clientY
+			// }));
 		});
 	}
 	/**
