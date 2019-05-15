@@ -8,8 +8,8 @@ import Game from './Game';
 import source from './source';
 import { SCREEN, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT } from './utils/constants'
 
-const width = window.screen.width;
-const height = window.screen.height;
+const width = document.getElementById('app').offsetWidth;
+const height = document.getElementById('app').offsetHeight;
 const app = new Application({
 	width,
 	height

@@ -63,7 +63,7 @@ class Controller {
 		controlFlashPressed.anchor.set(0.5, 0.5);
 		controlFlashPressed.position.set(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		if (app.shouldHorizontalScreen) {
-			controlFlashPressed.position.set(260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
+			controlFlashPressed.position.set(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
 		}
 		controlFlashPressed.visible = false;
 		container.addChild(controlFlashPressed);

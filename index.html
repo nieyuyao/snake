@@ -1,22 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>贪吃蛇</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
+      * {
+        margin: 0;
+        padding: 0;
+      }
+			html {
+				height: 100%;
+			}
+      body {
+				height: 100%;
+        overflow: hidden;
+        background-color: #000;
+				box-sizing: border-box;
+      }
+      @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+        @supports (bottom: env(safe-area-inset-top)) {
+          body {
+            padding-top: calc(env(safe-area-inset-top) * 2);
+						padding-bottom: calc(env(safe-area-inset-bottom) * 2);
+          }
         }
-        body {
-            overflow: hidden;
+      }
+
+      /*iPhoneXS Max*/
+      @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-min-device-pixel-ratio: 3) {
+        @supports (bottom: env(safe-area-inset-top)) {
+          body {
+            padding-top: calc(env(safe-area-inset-top) * 2);
+						padding-bottom: calc(env(safe-area-inset-bottom) * 2);
+          }
         }
+      }
+      /*iPhoneXR*/
+      @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-min-device-pixel-ratio: 2) {
+        @supports (bottom: env(safe-area-inset-top)) {
+					body {
+            padding-top: calc(env(safe-area-inset-top) * 2);
+						padding-bottom: calc(env(safe-area-inset-bottom) * 2);
+          }
+        }
+      }
+			#app {
+				height: 100%;
+			}
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div id="app"></div>
-</body>
-<script></script>
+  </body>
+  <script></script>
 </html>
