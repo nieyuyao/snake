@@ -94,22 +94,22 @@ class Game {
 		// 		x: e.clientX, y: e.clientY
 		// 	}));
 		// });
-		// touch
+
+		// pointer事件在移动端没有
 		app.view.addEventListener('touchstart', (e) => {
-			EventController.publish(new Event('pointerdown', { 
-				x: e.touches[0].clientX, y: e.touches[0].clientY
-			}));
+			EventController.publish(new Event('pointerdown', [
+				{x: e.touches[0].clientX, y: e.touches[0].clientY},
+				{x: e.touches[1] ? e.touches[1].clientX : -1, y: e.touches[1] ? e.touches[1].clientY : -1}
+			]));
 		});
 		app.view.addEventListener('touchmove', (e) => {
-			EventController.publish(new Event('pointermove', { 
-				x: e.touches[0].clientX, y: e.touches[0].clientY
-			}));
+			EventController.publish(new Event('pointermove', [
+				{x: e.touches[0].clientX, y: e.touches[0].clientY},
+				{x: e.touches[1] ? e.touches[1].clientX : -1, y: e.touches[1] ? e.touches[1].clientY : -1}
+			]));
 		});
-		app.view.addEventListener('touchend', (e) => {
+		app.view.addEventListener('touchend', () => {
 			EventController.publish(new Event('pointerup'));
-			// EventController.publish(new Event('pointerup', { 
-			// 	x: e.touches[0].clientX, y: e.touches[0].clientY
-			// }));
 		});
 	}
 	/**

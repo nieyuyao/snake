@@ -40,6 +40,7 @@ class Controller {
 		} = this;
 
 		controlBack.anchor.set(0.5, 0.5);
+		controlBack.scale.set(1.5, 1.5);
 		controlBack.position.set(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		if (app.shouldHorizontalScreen) {
 			controlBack.position.set(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
@@ -47,6 +48,7 @@ class Controller {
 		container.addChild(controlBack);
 
 		controlRocker.anchor.set(0.5, 0.5);
+		controlRocker.scale.set(1.5, 1.5);
 		controlRocker.position.set(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		if (app.shouldHorizontalScreen) {
 			controlRocker.position.set(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
@@ -54,6 +56,7 @@ class Controller {
 		container.addChild(controlRocker);
 
 		controlFlash.anchor.set(0.5, 0.5);
+		controlFlash.scale.set(1.5, 1.5);
 		controlFlash.position.set(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		if (app.shouldHorizontalScreen) {
 			controlFlash.position.set(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
@@ -61,6 +64,7 @@ class Controller {
 		container.addChild(controlFlash);
 
 		controlFlashPressed.anchor.set(0.5, 0.5);
+		controlFlashPressed.scale.set(1.5, 1.5);
 		controlFlashPressed.position.set(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		if (app.shouldHorizontalScreen) {
 			controlFlashPressed.position.set(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
@@ -71,7 +75,8 @@ class Controller {
 		cancel.anchor.set(0.5, 0.5);
 		cancel.position.set(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 40 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
 		if (app.shouldHorizontalScreen) {
-			cancel.position.set(40 / CONTROLLER_BASE_HEIGHT * SCREEN.width, 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
+			cancel.position.set(40 / CONTROLLER_BASE_HEIGHT * SCREEN.width, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height);
+			cancel.rotation = -Math.PI / 2;
 		}
 		container.addChild(cancel);
 
@@ -79,7 +84,8 @@ class Controller {
 		score.height = SCORE_HEIGHT;
 		score.position.set(SCREEN.width - SCORE_WIDTH, 0);
 		if (app.shouldHorizontalScreen) {
-			score.position.set(0, SCREEN.height - SCORE_WIDTH);
+			score.position.set(0, SCORE_WIDTH);
+			score.rotation = -Math.PI / 2;
 		}
 		const graphics = new Graphics();
 		graphics.beginFill(0x000000, 0.4);
@@ -107,15 +113,21 @@ class Controller {
 			})(),
 			controlBackBounding: (() => {
 				if (app.shouldHorizontalScreen) {
-					return new Sphere(260 / CONTROLLER_BASE_WIDTH * SCREEN.height, 150 / CONTROLLER_BASE_HEIGHT * SCREEN.width, 40);
+					return new Sphere(260 / CONTROLLER_BASE_WIDTH * SCREEN.height, 150 / CONTROLLER_BASE_HEIGHT * SCREEN.width, 40 * 3);
 				}
-				return new Sphere(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40);
+				return new Sphere(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40 * 3);
 			})(), //设置控制区域所在的圆，用于计算点击位置是否在包围圆内
+			cancelBounding: (() => {
+				if (app.shouldHorizontalScreen) {
+					return new Sphere(40 / CONTROLLER_BASE_HEIGHT * SCREEN.width, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height, 50);
+				}
+				return new Sphere(150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 40 / CONTROLLER_BASE_HEIGHT * SCREEN.height);
+			})(),
 			controlFlashPressedBouding: (() => {
 				if (app.shouldHorizontalScreen) {
-					return new Sphere(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height, 40);
+					return new Sphere(260 / CONTROLLER_BASE_HEIGHT * SCREEN.width, SCREEN.height - 150 / CONTROLLER_BASE_WIDTH * SCREEN.height, 40 * 3);
 				}
-				return new Sphere(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40);
+				return new Sphere(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40 * 3);
 			})(),
 			matrix: new Matrix(),
 			accOrSlowDown: 1,
@@ -128,23 +140,43 @@ class Controller {
 				mySnake.advance(this.accOrSlowDown, this.advanceCallback, this);
 			},
 			pointerDown(e) {
-				if (this.controlBackBounding.surroundPoint(e.val)) {
-					this.isControlPointerDown = true;
-					self.setRockerPos(this.matrix, e.val, this.controlBackOrigin);
-					//更新地图移动的方向
-					const direc = normalizeDirec({x: -e.val.x + this.controlBackOrigin.x, y: -e.val.y + this.controlBackOrigin.y});
-					mySnake.turnAround(contraryVector(direc));
+				if (this.cancelBounding.surroundPoint(e.val[0]) || this.cancelBounding.surroundPoint(e.val[1])) {
+					window.close();
+					return;
 				}
-				if (this.controlFlashPressedBouding.surroundPoint(e.val)) {
+				let point;
+				if (this.controlBackBounding.surroundPoint(e.val[0])) {
+					point = e.val[0];
+				} else if (this.controlBackBounding.surroundPoint(e.val[1])) {
+					point = e.val[1];
+				}
+				if (this.controlFlashPressedBouding.surroundPoint(e.val[0]) || this.controlFlashPressedBouding.surroundPoint(e.val[1])) {
 					this.accOrSlowDown = 1;
 					app.ticker.add(this.advance, this);
 					self.toggleFlashPressed(true);
 				}
+				if (!point) {
+					return;
+				}
+				this.isControlPointerDown = true;
+				self.setRockerPos(this.matrix, point, this.controlBackOrigin);
+				//更新地图移动的方向
+				const direc = normalizeDirec({x: -point.x + this.controlBackOrigin.x, y: -point.y + this.controlBackOrigin.y});
+				mySnake.turnAround(contraryVector(direc));
 			},
 			pinterMove(e) {
 				if (this.isControlPointerDown) {
-					self.setRockerPos(this.matrix, e.val, this.controlBackOrigin);
-					const direc = normalizeDirec({x: -e.val.x + this.controlBackOrigin.x, y: -e.val.y + this.controlBackOrigin.y});
+					let point;
+					if (this.controlBackBounding.surroundPoint(e.val[0])) {
+						point = e.val[0];
+					} else if (this.controlBackBounding.surroundPoint(e.val[1])) {
+						point = e.val[1];
+					}
+					if (!point) {
+						return;
+					}
+					self.setRockerPos(this.matrix, point, this.controlBackOrigin);
+					const direc = normalizeDirec({x: -point.x + this.controlBackOrigin.x, y: -point.y + this.controlBackOrigin.y});
 					mySnake.turnAround(contraryVector(direc));
 				}
 			},
