@@ -2,8 +2,6 @@ import GameMap from './GameMap';
 import Controller from './Controller';
 import Event from './event/Event';
 import EventController from './event/EventController';
-import Snake from './snake/Snake';
-import AiSnake from './snake/AiSnake';
 import FoodsManager from './food/FoodsManager';
 import SnakeManager from './snake/SnakeManager';
 import Ai from './Ai';
@@ -18,9 +16,8 @@ class Game {
 		this.snakeManager = new SnakeManager();
 		this.gameMap = new GameMap(this.app);
 		const mySnake = this.snakeManager.createSnake();
-		this.controller = new Controller(this.app, this.gameMap, mySnake);
+		this.controller = new Controller(this.app, this.gameMap, this.snakeManager, mySnake);
 		this.ai = new Ai(this.snakeManager);
-		// this.aiSnake = new AiSnake();
 		this.foodsManager.init(this.snakeManager);
 		this.snakeManager.init();
 		// 初始化地图
@@ -67,35 +64,52 @@ class Game {
 	 */
 	initEventListeners() {
 		const { app } = this;
-		app.view.addEventListener('pointerenter', (e) => {
-			EventController.publish(new Event('pointerenter', { 
-				x: e.clientX, y: e.clientY
-			}));
+		// app.view.addEventListener('pointerenter', (e) => {
+		// 	EventController.publish(new Event('pointerenter', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// app.view.addEventListener('pointerleave', (e) => {
+		// 	EventController.publish(new Event('pointerleave', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// app.view.addEventListener('pointerdown', (e) => {
+		// 	EventController.publish(new Event('pointerdown', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// app.view.addEventListener('pointermove', (e) => {
+		// 	EventController.publish(new Event('pointermove', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// app.view.addEventListener('pointerup', (e) => {
+		// 	EventController.publish(new Event('pointerup', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+		// app.view.addEventListener('pointerout', (e) => {
+		// 	EventController.publish(new Event('pointerout', { 
+		// 		x: e.clientX, y: e.clientY
+		// 	}));
+		// });
+
+		// pointer事件在移动端没有
+		app.view.addEventListener('touchstart', (e) => {
+			EventController.publish(new Event('pointerdown', [
+				{x: e.touches[0].clientX, y: e.touches[0].clientY},
+				{x: e.touches[1] ? e.touches[1].clientX : -1, y: e.touches[1] ? e.touches[1].clientY : -1}
+			]));
 		});
-		app.view.addEventListener('pointerleave', (e) => {
-			EventController.publish(new Event('pointerleave', { 
-				x: e.clientX, y: e.clientY
-			}));
+		app.view.addEventListener('touchmove', (e) => {
+			EventController.publish(new Event('pointermove', [
+				{x: e.touches[0].clientX, y: e.touches[0].clientY},
+				{x: e.touches[1] ? e.touches[1].clientX : -1, y: e.touches[1] ? e.touches[1].clientY : -1}
+			]));
 		});
-		app.view.addEventListener('pointerdown', (e) => {
-			EventController.publish(new Event('pointerdown', { 
-				x: e.clientX, y: e.clientY
-			}));
-		});
-		app.view.addEventListener('pointermove', (e) => {
-			EventController.publish(new Event('pointermove', { 
-				x: e.clientX, y: e.clientY
-			}));
-		});
-		app.view.addEventListener('pointerup', (e) => {
-			EventController.publish(new Event('pointerup', { 
-				x: e.clientX, y: e.clientY
-			}));
-		});
-		app.view.addEventListener('pointerout', (e) => {
-			EventController.publish(new Event('pointerout', { 
-				x: e.clientX, y: e.clientY
-			}));
+		app.view.addEventListener('touchend', () => {
+			EventController.publish(new Event('pointerup'));
 		});
 	}
 	/**

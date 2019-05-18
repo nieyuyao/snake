@@ -1,7 +1,7 @@
 import { Sprite, Texture } from 'pixi.js';
 import Interpolation from '../utils/Interpolation';
 import { Sphere } from '../utils/Bound';
-import { FOOD_CHECK_SPHERE_RADIUS } from '../utils/constants';
+import { FOOD_CHECK_SPHERE_RADIUS, TEXTURES } from '../utils/constants';
 
 class Food {
 	/**
@@ -18,7 +18,15 @@ class Food {
 		this.visible = true;
 		this.interp = new Interpolation({x: x, y: y}, 6);
 		this.eaten = false;
-		this.sprite = new Sprite(Texture.fromFrame('bean' + type + '.png'));
+		const frame = 'bean' + type + '.png';
+		let texture;
+		if (TEXTURES[frame]) {
+			texture = TEXTURES[frame];
+		} else {
+			texture = Texture.fromFrame(frame);
+			TEXTURES[frame] = texture;
+		}
+		this.sprite = new Sprite(texture);
 		this.sprite.anchor.set(0.5, 0.5);
 		this.sprite.name = 'food';
 		this.sprite.position.set(x, y);
@@ -43,7 +51,8 @@ class Food {
 		const dx = this.x - val.x;
 		const dy = this.y - val.y;
 		if (dx * dx + dy * dy < 1) {
-			this.destory();
+			this.visible = false;
+			this.sprite.visible = false;
 			return;
 		}
 		this.x = val.x;
@@ -54,8 +63,7 @@ class Food {
 	 * 销毁食物
 	 */
 	destory() {
-		this.sprite.visible = false;
-		this.visible = false;
+		this.sprite.destroy();
 	}
 }
 export default Food;

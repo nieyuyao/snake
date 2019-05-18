@@ -7,11 +7,16 @@ import {
 import Game from './Game';
 import source from './source';
 import { SCREEN, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT } from './utils/constants'
- 
+
+const width = document.getElementById('app').offsetWidth;
+const height = document.getElementById('app').offsetHeight;
 const app = new Application({
-	width: window.screen.width,
-	height: window.screen.height
+	width,
+	height
 });
+if (width < height) {
+	app.shouldHorizontalScreen = true;
+}
 document.querySelector('#app').appendChild(app.view);
 
 const loadingTexts = ['Loading', 'Loading.', 'Loading..', 'Loading...'];

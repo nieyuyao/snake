@@ -53,12 +53,29 @@ const config = {
 	}
 };
 if (isProd) {
-	config.plugins.push(
-		new uglifyJsPlugin({
-			test: /\.js$/,
-			sourceMap: true
-		})
-	);
+	config.plugins = [...config.plugins, new uglifyJsPlugin({
+		test: /\.js$/,
+		sourceMap: true
+	}),
+	{
+		apply(compiler) {
+			compiler.hooks.emit.tap('AssetsPlugin', (compilation) => {
+				const assetsPath = path.resolve(__dirname, './assets');
+				const filePaths = fs.readdirSync(assetsPath);
+				filePaths.forEach(fp => {
+					const buffer = fs.readFileSync(assetsPath + '/' + fp);
+					compilation.assets['/assets/' + fp] = {
+						source() {
+							return buffer;
+						},
+						size() {
+							return Buffer.byteLength(buffer);
+						}
+					}
+				});
+			});
+		}
+	}];
 } else {
 	config.devtool = 'source-map';
 }

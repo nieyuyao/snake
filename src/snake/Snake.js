@@ -85,12 +85,12 @@ class Snake {
 	 * @param {Oject} context 回调函数上下文
 	 */
 	advance(accOrSlowDown, cb, context) {
-		if (this.v >= this.VEC_MAX && accOrSlowDown === 1) {
-			this.v = this.VEC_MAX;
+		if (this.v >= SNAKE_VEC_MAX && accOrSlowDown === 1) {
+			this.v = SNAKE_VEC_MAX;
 			return;
 		}
-		else if (this.v <= this.VEC_MIN && accOrSlowDown === -1) {
-			this.v = this.VEC_MIN;
+		else if (this.v <= SNAKE_VEC_MIN && accOrSlowDown === -1) {
+			this.v = SNAKE_VEC_MIN;
 			return;
 		}
 		else {

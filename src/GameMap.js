@@ -4,12 +4,14 @@ import {
 	Point,
 	Texture
 } from 'pixi.js';
+import source from './source';
 import {
 	_OFFSET_CANVAS_WIDTH,
 	_OFFSET_CANVAS_HEIGHT,
 	SCREEN,
 	SNAKE_BOUND
 } from './utils/constants';
+
 
 class GameMap {
 	constructor() {
@@ -33,7 +35,7 @@ class GameMap {
 		this.mySnake = mySnake;
 		const { container, mapSprite } = this;
 		// 初始化mapSprite
-		mapSprite.texture = Texture.fromImage('../assets/tile_map_1.png');
+		mapSprite.texture = Texture.fromImage(source['tile_map_1.png']);
 		mapSprite.name = 'MapSprite';
 		// 初始化容器
 		container.addChild(mapSprite);
@@ -84,6 +86,10 @@ class GameMap {
 		}
 		mPoint.x = -x;
 		mPoint.y = -y;
+	}
+	destory() {
+		this.mapSprite.destroy();
+		this.container.destroy();
 	}
 }
 export default GameMap;
