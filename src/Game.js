@@ -2,8 +2,6 @@ import GameMap from './GameMap';
 import Controller from './Controller';
 import Event from './event/Event';
 import EventController from './event/EventController';
-import Snake from './snake/Snake';
-import AiSnake from './snake/AiSnake';
 import FoodsManager from './food/FoodsManager';
 import SnakeManager from './snake/SnakeManager';
 import Ai from './Ai';
