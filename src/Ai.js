@@ -19,6 +19,9 @@ class Ai {
 		const aiSnake = new AiSnake(this.sm);
 		this.addSnake(aiSnake);
 	}
+	recover() {
+		this.snakes = [];
+	}
 }
 
 export default Ai;

@@ -24,6 +24,7 @@ class Snake {
 		this.score = 0;
 		this.died = false;
 		this.sm = sm;
+		this.isMine = false;
 	}
 	/**
 	 * 初始化

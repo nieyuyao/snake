@@ -8,15 +8,14 @@ import {
 } from 'pixi.js';
 import EventController from './event/EventController';
 import { Sphere } from './utils/Bound';
-import { SCREEN, CONTROLLER_BASE_WIDTH, CONTROLLER_BASE_HEIGHT, SCORE_WIDTH, SCORE_HEIGHT, SCORE_TEXT_STYLE } from './utils/constants';
+import { SCREEN, CONTROLLER_BASE_WIDTH, CONTROLLER_BASE_HEIGHT, SCORE_WIDTH, SCORE_HEIGHT, SCORE_TEXT_STYLE, GAME_OVER, GAME_RESTART } from './utils/constants';
 
 class Controller {
-	constructor(app, map, sm, mySnake) {
+	constructor(app, map, sm) {
 		this.name = 'controller';
 		this.container = new Container();
 		this.app = app;
 		this.map = map; //地图
-		this.mySnake = mySnake;
 		this.scoreTexts = [];
 		this.sm = sm;
 	}
@@ -27,6 +26,7 @@ class Controller {
 		this.controlFlashPressed = new Sprite(Texture.fromFrame('control-flash-pressed.png'));
 		this.cancel = new Sprite(Texture.fromFrame('btn-back.png')); //返回按钮
 		this.score = new Container();
+		this.gameOver = new Container();
 
 		const {
 			container,
@@ -36,6 +36,7 @@ class Controller {
 			controlFlashPressed,
 			cancel,
 			score,
+			gameOver,
 			app
 		} = this;
 
@@ -94,7 +95,25 @@ class Controller {
 		score.addChild(graphics);
 		container.addChild(score);
 
-		const {normalizeDirec, contraryVector, mySnake} = this;
+		gameOver.width = SCREEN.width;
+		gameOver.height = SCREEN.height;
+		const overSprite = new Sprite(Texture.fromFrame('btn-restart.png'));
+		overSprite.position.set(SCREEN.width / 2, SCREEN.height / 2);
+		overSprite.anchor.set(0.5, 0.5);
+		overSprite.scale.set(1.5, 1.5);
+		if (app.shouldHorizontalScreen) {
+			overSprite.rotation = -Math.PI / 2;
+		}
+		const overBgGraphics = new Graphics();
+		overBgGraphics.beginFill(0x000000, 0.4);
+		overBgGraphics.drawRect(0, 0, SCREEN.width, SCREEN.height);
+		overBgGraphics.endFill();
+		gameOver.visible = false;
+		gameOver.addChild(overBgGraphics);
+		gameOver.addChild(overSprite);
+		container.addChild(gameOver);
+
+		const {normalizeDirec, contraryVector} = this;
 
 		const self = this;
 		this.pointerHandler = {
@@ -129,6 +148,7 @@ class Controller {
 				}
 				return new Sphere(SCREEN.width - 150 / CONTROLLER_BASE_WIDTH * SCREEN.width, 260 / CONTROLLER_BASE_HEIGHT * SCREEN.height, 40 * 3);
 			})(),
+			overBounding: new Sphere(SCREEN.width / 2, SCREEN.height / 2, 45 * 1.5),
 			matrix: new Matrix(),
 			accOrSlowDown: 1,
 			advanceCallback: function (accOrSlowDown) {
@@ -137,11 +157,15 @@ class Controller {
 				}
 			},
 			advance: function () {
-				mySnake.advance(this.accOrSlowDown, this.advanceCallback, this);
+				self.mySnake.advance(this.accOrSlowDown, this.advanceCallback, this);
 			},
 			pointerDown(e) {
+				if (self.gameOver.visible && (this.overBounding.surroundPoint(e.val[0]) || this.overBounding.surroundPoint(e.val[1]))) {
+					EventController.publish(new Event(GAME_RESTART));
+					self.gameOver.visible = false;
+					return;
+				}
 				if (this.cancelBounding.surroundPoint(e.val[0]) || this.cancelBounding.surroundPoint(e.val[1])) {
-					window.close();
 					return;
 				}
 				let point;
@@ -162,7 +186,7 @@ class Controller {
 				self.setRockerPos(this.matrix, point, this.controlBackOrigin);
 				//更新地图移动的方向
 				const direc = normalizeDirec({x: -point.x + this.controlBackOrigin.x, y: -point.y + this.controlBackOrigin.y});
-				mySnake.turnAround(contraryVector(direc));
+				self.mySnake.turnAround(contraryVector(direc));
 			},
 			pinterMove(e) {
 				if (this.isControlPointerDown) {
@@ -177,7 +201,7 @@ class Controller {
 					}
 					self.setRockerPos(this.matrix, point, this.controlBackOrigin);
 					const direc = normalizeDirec({x: -point.x + this.controlBackOrigin.x, y: -point.y + this.controlBackOrigin.y});
-					mySnake.turnAround(contraryVector(direc));
+					self.mySnake.turnAround(contraryVector(direc));
 				}
 			},
 			pointerUp(e) {
@@ -192,23 +216,33 @@ class Controller {
 			}
 		}
 		this.registerEventHandler();
-
 		// 更新分数
-		app.ticker.add(() => {
+		this.updateScoreTicker = () => {
 			this.updateScore();
-		});
+		}
+		app.ticker.add(this.updateScoreTicker);
+	}
+	setMySnake(mySnake) {
+		this.mySnake = mySnake;
 	}
 	registerEventHandler() {
-		const { pointerHandler } = this;
-		EventController.subscribe('pointerdown', ev => {
+		const { pointerHandler, gameOver } = this;
+		this.onPointerDown = ev => {
 			pointerHandler.pointerDown(ev);
-		});
-		EventController.subscribe('pointermove', ev => {
+		}
+		EventController.subscribe('pointerdown', this.onPointerDown);
+		this.onPointerMove = ev => {
 			pointerHandler.pinterMove(ev);
-		});
-		EventController.subscribe('pointerup', ev => {
+		}
+		EventController.subscribe('pointermove', this.onPointerMove);
+		this.onPointerUp = ev => {
 			pointerHandler.pointerUp(ev);
-		});
+		}
+		EventController.subscribe('pointerup', this.onPointerUp);
+		this.onGameOver = ev => {
+			gameOver.visible = true;
+		}
+		EventController.subscribe(GAME_OVER, this.onGameOver);
 	}
 	//设置控制球的位置
 	setRockerPos(matrix, p2, p1) {
@@ -268,6 +302,32 @@ class Controller {
 			}
 		}
 		/* eslint-enable */
+	}
+	destory() {
+		const {
+			container,
+			controlBack,
+			controlRocker,
+			controlFlash,
+			controlFlashPressed,
+			cancel,
+			score,
+			gameOver,
+			app
+		} = this;
+		app.ticker.remove(this.updateScoreTicker);
+		score.destroy();
+		gameOver.destroy();
+		cancel.destroy();
+		controlFlashPressed.destroy();
+		controlFlash.destroy();
+		controlRocker.destroy();
+		controlBack.destroy();
+		container.destroy();
+		EventController.remove(this.onGameOver);
+		EventController.remove(this.onPointerDown);
+		EventController.remove(this.onPointerMove);
+		EventController.remove(this.onPointerUp);
 	}
 }
 export default Controller;

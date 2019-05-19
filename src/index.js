@@ -66,6 +66,7 @@ for (const key in source) {
 loader.load(() => {
 	app.stage.removeChild(loadingText);
 	const game = new Game(app);
+	window.game = game;
 	// 启动游戏
 	game.init();
 });

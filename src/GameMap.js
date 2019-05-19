@@ -27,12 +27,10 @@ class GameMap {
 	 * 初始化
 	 * @param {FoodManager} fm
 	 * @param {SnakeManager} sm
-	 * @param {Snake} mySnake
 	 */
-	init(fm, sm, mySnake) {
+	init(fm, sm) {
 		this.fm = fm;
 		this.sm = sm;
-		this.mySnake = mySnake;
 		const { container, mapSprite } = this;
 		// 初始化mapSprite
 		mapSprite.texture = Texture.fromImage(source['tile_map_1.png']);
@@ -42,6 +40,9 @@ class GameMap {
 		container.addChild(fm.container);
 		container.addChild(sm.container);
 		container.name = 'GameMap';
+	}
+	setMySnake(mySnake) {
+		this.mySnake = mySnake;
 	}
 	/**
 	 * 更新地图

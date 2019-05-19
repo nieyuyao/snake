@@ -16,7 +16,7 @@ import {
 import EventController from '../event/EventController';
 
 class FoodsManager {
-	constructor() {
+	constructor(sm) {
 		this.name = 'foodsmanager';
 		this.foods = [];
 		this.idleOrder = 0; //表示食物列表空闲的最小值，防止每次遍历食物列表都从0开始，降低时间复杂度
@@ -28,19 +28,18 @@ class FoodsManager {
 		this.mPoint = new Point();
 		this.division = {};
 		this.container = new Container();
+		this.container.position.set(0, 0);
+		this.container.name = 'FoodManager';
+		this.sm = sm;
 	}
 	/**
 	 * @param {SnakeManager} sm 蛇管理器
 	 */
-	init(sm) {
-		this.sm = sm;
+	init() {
 		const {
 			division,
 			container
 		} = this;
-		// 设置container的宽高
-		container.position.set(0, 0);
-		container.name = 'FoodManager';
 		// 将食物绘图区划分为30*15份100*100的区域
 		for (let i = 0; i < HORIZONTAL_DIVISION_NUM; i++) {
 			for (let j = 0; j < VERTICAL__DIVISION_NUM; j++) {
@@ -110,6 +109,7 @@ class FoodsManager {
 		if (this.idleOrder > order) {
 			this.idleOrder = order;
 		}
+		this.container.removeChild(food.sprite);
 		food.destory();
 		delete this.foods[order];
 	}
@@ -211,7 +211,24 @@ class FoodsManager {
 			this.createFood(positions[p].x, positions[p].y);
 		}
 	}
+	recover() {
+		const {foods, container} = this;
+		foods.forEach(food => {
+			if (food) {
+				container.removeChild(food.sprite);
+				food.destory();
+			}
+		});
+		this.foods = [];
+		this.division = {};
+		EventController.remove(DIE_SNAKE_SCORE, this.eventHandler);
+		this.init();
+	}
 	destory() {
+		this.foods.forEach(food => {
+			food.destory();
+		});
+		this.container.destroy();
 		EventController.remove(DIE_SNAKE_SCORE, this.eventHandler);
 	}
 }

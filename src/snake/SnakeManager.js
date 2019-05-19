@@ -1,5 +1,5 @@
 import { Point, Container } from 'pixi.js';
-import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, SNAKE_DIE_EVENT_NAME, DIE_SNAKE_SCORE } from '../utils/constants';
+import { HORIZONTAL_DIVISION_NUM, VERTICAL__DIVISION_NUM, _OFFSET_CANVAS_WIDTH, _OFFSET_CANVAS_HEIGHT, SNAKE_DIE_EVENT_NAME, DIE_SNAKE_SCORE, GAME_OVER } from '../utils/constants';
 import EventController from '../event/EventController';
 import Event from '../event/Event';
 import Snake from './Snake';
@@ -15,9 +15,11 @@ class SnakeManager {
 		this.division = {};
 		this.snakes = [];
 		this.container = new Container();
+		this.container.position.set(0, 0);
+		this.container.name = 'SnakeManager';
 	}
 	init() {
-		const { division, container } = this;
+		const { division } = this;
 		for (let i = 0; i < HORIZONTAL_DIVISION_NUM; i++) {
 			for (let j = 0; j < VERTICAL__DIVISION_NUM; j++) {
 				const key = `_${i}_${j}`;
@@ -25,8 +27,6 @@ class SnakeManager {
 			}
 		}
 		// 初始化容器
-		container.position.set(0, 0);
-		container.name = 'SnakeManager';
 		const self = this;
 		this.eventHandle = function (ev) {
 			self.removeSnake(ev.val);
@@ -58,12 +58,16 @@ class SnakeManager {
 	 */
 	removeSnake(id) {
 		const snake = this.snakes[id];
+		this.container.removeChild(snake.container);
 		snake.destory();
 		EventController.publish(new Event(DIE_SNAKE_SCORE, {
 			score: snake.score,
 			positions: snake.getAllBodyPos()
 		}));
 		delete this.snakes[id];
+		if (snake.isMine) {
+			EventController.publish(new Event(GAME_OVER))
+		}
 	}
 	/**
 	 * 更新每条蛇的位置
@@ -100,8 +104,26 @@ class SnakeManager {
 		this.addSnake(snake);
 		return snake;
 	}
+	removeAllSnakes() {
+		const {snakes, container} = this;
+		snakes.forEach(snake => {
+			if (snake) {
+				container.removeChild(snake.container);
+				snake.destory();
+			}
+		});
+		this.snakes = [];
+	}
+	recover() {
+		this.removeAllSnakes();
+		this.division = {};
+		EventController.remove(SNAKE_DIE_EVENT_NAME, this.eventHandle);
+		this.init();
+	}
 	destroy() {
-		
+		this.removeAllSnakes();
+		this.container.destroy();
+		EventController.remove(this.eventHandle);
 	}
 }
 export default SnakeManager;
