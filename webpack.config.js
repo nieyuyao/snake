@@ -43,8 +43,9 @@ const config = {
 		),
 		new htmlWebpackPlugin({
 			inject: true,
-			filename: path.resolve(__dirname) + '/dist/index.html',
-			templateContent: fs.readFileSync(path.resolve(__dirname) + '/index.html').toString()
+			filename: path.resolve(__dirname, './dist/index.html'),
+			template: path.resolve(__dirname, './index.html')
+			// templateContent: fs.readFileSync(path.resolve(__dirname) + '/index.html').toString()
 		})
 	],
 	// webpack4.*新增
